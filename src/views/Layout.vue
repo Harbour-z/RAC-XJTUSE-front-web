@@ -126,7 +126,7 @@ const handleCommand = (command) => {
         <router-view/>
       </el-main>
       <!-- 底部区域 -->
-      <el-footer>后台管理系统 ©2024 </el-footer>
+      <el-footer>小众点评管理系统 ©2025 </el-footer>
     </el-container>
   </el-container>
 </template>

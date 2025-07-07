@@ -1,33 +1,78 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import {ElMessage} from "element-plus";
-import {userLogin} from "../api/api";
-//
-// const username = ref('admin')
-// const password = ref('admin')
-// const router = useRouter();
-//
-// const login = () => {
-//   const user={
-//     loginName:username.value,
-//     password:password.value
-//   }
-//   userLogin(user).then(res => {
-//     if(!res.data){
-//           ElMessage({
-//             message:'用户名密码错误',
-//             type:'warning'
-//           })
-//         }else{
-//           ElMessage({
-//             message:'登录成功',
-//             type:'success'
-//           })
-//           router.push({path:'/user/list'})
-//         }
-//   })
-// };
+import {adminLogin, merchantLogin, userLogin} from "../api/api";
 import {onMounted, ref} from 'vue';
+
+const router = useRouter()
+
+// 登录表单数据
+const loginForm = ref({
+  username: '',
+  password: '',
+  role: '用户' // 默认为学员
+})
+
+// 注册表单数据
+const registerForm = ref({
+  username: '',
+  email: '',
+  password: ''
+})
+
+const handleLogin = async (e) => {
+  e.preventDefault()
+
+  if (!loginForm.value.username || !loginForm.value.password) {
+    ElMessage.warning('请输入用户名和密码')
+    return
+  }
+
+  try {
+    let res
+    const { username, password, role } = loginForm.value
+    // 根据选择的身份调用不同的API
+    switch(role) {
+      case '用户':
+        res = await userLogin({ loginName: username, password: password })
+        break
+      case '商家':
+        res = await merchantLogin({ loginName: username, password: password })
+        break
+      case '管理员':
+        res = await adminLogin({ loginName: username, password: password })
+        break
+      default:
+        throw new Error('未知用户身份')
+    }
+
+    if (!res.data) {
+      ElMessage.error('用户名或密码错误')
+    } else {
+      ElMessage.success(`${role}登录成功`)
+      // 根据身份跳转到不同页面
+      switch(role) {
+        case '用户':
+          router.push({ path: '/user/dashboard' })
+          break
+        case '商家':
+          router.push({ path: '/merchant/dashboard' })
+          break
+        case '管理员':
+          router.push({ path: '/admin/dashboard' })
+          break
+      }
+    }
+  } catch (error) {
+    ElMessage.error(`登录失败: ${error.message}`)
+  }
+}
+
+// 注册功能保持不变
+const handleRegister = (e) => {
+  e.preventDefault()
+  ElMessage.info('注册功能待实现')
+}
 
 let container, signInBtn, signUpBtn
 
@@ -50,65 +95,44 @@ onMounted(() => {
   }
 })
 
-const radio = ref("商家")
+const radio = ref("用户")
 
 </script>
 
 <template>
-
-  <div class="login-body">
-<!--    <div class="login-panel">-->
-<!--      <div class="login-title">用户登录</div>-->
-<!--      <el-form :model="formData" ref="formDataRef">-->
-<!--        <el-form-item prop="username">-->
-<!--          <el-input placeholder="Username" v-model="username" size="large" type="text">-->
-<!--          </el-input>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item prop="password">-->
-<!--          <el-input placeholder="password" v-model="password" size="large" type="password"-->
-<!--                    @keyup.enter.native="login()">-->
-<!--          </el-input>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item label="">-->
-<!--          <el-button type="primary" style="width: 100%;" @click="login()" size="large">Sign in</el-button>-->
-<!--        </el-form-item>-->
-<!--      </el-form>-->
-<!--    </div>-->
-  </div>
-
   <div class="container">
     <div class="forms-container">
       <div class="signin-signup">
-        <form action="#" class="sign-in-form">
+        <form action="#" class="sign-in-form" @submit="handleLogin">
           <h2 class="title">Sign in</h2>
           <div class="input-field">
             <i class="fas fa-user"></i>
-            <input type="text" placeholder="Username" />
+            <input v-model="loginForm.username" type="text" placeholder="Username" required/>
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input type="password" placeholder="Password" />
+            <input v-model="loginForm.password" type="password" placeholder="Password" required />
           </div>
-          <el-radio-group v-model="radio">
-            <el-radio value="商家">商家</el-radio>
+          <el-radio-group v-model="loginForm.role">
             <el-radio value="用户">用户</el-radio>
+            <el-radio value="商家">商家</el-radio>
             <el-radio value="管理员">管理员</el-radio>
           </el-radio-group>
           <input  type="submit" value="Login" class="btn solid" />
         </form>
-        <form action="#" class="sign-up-form">
+        <form action="#" class="sign-up-form" @submit="handleRegister">
           <h2 class="title">Sign up</h2>
           <div class="input-field">
             <i class="fas fa-user"></i>
-            <input type="text" placeholder="Username" />
+            <input v-model="registerForm.username" type="text" placeholder="Username" />
           </div>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
-            <input type="email" placeholder="Email" />
+            <input v-model="registerForm.email" type="email" placeholder="Email" />
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input type="password" placeholder="Password" />
+            <input v-model="registerForm.password" type="password" placeholder="Password" />
           </div>
           <input type="submit" class="btn" value="Sign up" />
         </form>

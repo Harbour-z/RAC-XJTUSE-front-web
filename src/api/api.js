@@ -1,7 +1,11 @@
 import request from "@/utils/request";
 
 //登录
-export const userLogin = (user) => request.post('/api/user/login',user);
+//传入用户名与密码
+export const userLogin = (query) => request.post('/api/user/login',query);
+export const merchantLogin = (query) => request.post('/api/merchant/login',query);
+export const adminLogin = (query) => request.post('/api/admin/login',query);
+
 
 //获取当前用户
 export const getCurUser = () => request.get('/api/user/getInfo')
