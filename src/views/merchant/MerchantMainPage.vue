@@ -1,11 +1,11 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 
 </script>
 
 <template>
   <div>
     <el-card>
-      <h1>附近搜索</h1>
+      <h1>商家主页</h1>
     </el-card>
   </div>
 </template>
