@@ -66,36 +66,36 @@ const handleCommand = (command) => {
       <div class="el-aside__logo"></div>
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/user/list">
+        <el-menu-item index="/user/MerchantMainPage">
           <el-icon>
             <Promotion/>
           </el-icon>
-          <span>用户管理</span>
+          <span>商家主页</span>
         </el-menu-item>
-        <el-menu-item index="/user/count">
+        <el-menu-item index="/user/MerchantSetting">
+          <el-icon>
+            <EditPen/>
+          </el-icon>
+          <span>商家设置</span>
+        </el-menu-item>
+        <el-menu-item index="/user/MerchantRegister">
           <el-icon>
             <User />
           </el-icon>
-          <span>用户统计</span>
+          <span>商家注册</span>
         </el-menu-item>
-        <el-sub-menu>
+        <el-sub-menu index="FansInteract">
           <template #title>
             <el-icon>
               <UserFilled/>
             </el-icon>
-            <span>个人中心</span>
+            <span>粉丝互动</span>
           </template>
-          <el-menu-item index="/user/info">
+          <el-menu-item index="/user/MerchantComment">
             <el-icon>
               <User/>
             </el-icon>
-            <span>基本资料</span>
-          </el-menu-item>
-          <el-menu-item index="/user/resetPassword">
-            <el-icon>
-              <EditPen/>
-            </el-icon>
-            <span>重置密码</span>
+            <span>商家评论</span>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
