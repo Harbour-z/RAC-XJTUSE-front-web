@@ -66,38 +66,24 @@ const handleCommand = (command) => {
       <div class="el-aside__logo"></div>
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/user/list">
+        <el-menu-item index="/user/UserManagement">
           <el-icon>
             <Promotion/>
           </el-icon>
           <span>用户管理</span>
         </el-menu-item>
-        <el-menu-item index="/user/count">
+        <el-menu-item index="/user/MerchantManagement">
           <el-icon>
             <User />
           </el-icon>
-          <span>用户统计</span>
+          <span>商家管理</span>
         </el-menu-item>
-        <el-sub-menu>
-          <template #title>
-            <el-icon>
-              <UserFilled/>
-            </el-icon>
-            <span>个人中心</span>
-          </template>
-          <el-menu-item index="/user/info">
-            <el-icon>
-              <User/>
-            </el-icon>
-            <span>基本资料</span>
-          </el-menu-item>
-          <el-menu-item index="/user/resetPassword">
-            <el-icon>
-              <EditPen/>
-            </el-icon>
-            <span>重置密码</span>
-          </el-menu-item>
-        </el-sub-menu>
+        <el-menu-item index="/user/DataAnalysis">
+          <el-icon>
+            <User />
+          </el-icon>
+          <span>数据可视化</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <!-- 右侧主区域 -->
@@ -140,7 +126,7 @@ const handleCommand = (command) => {
 
     &__logo {
       height: 120px;
-      background: url('') no-repeat center / 120px auto;
+      background: url('src/assets/') no-repeat center / 120px auto;
     }
 
     .el-menu {
