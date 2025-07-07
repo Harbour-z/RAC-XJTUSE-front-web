@@ -8,8 +8,8 @@ const router = useRouter()
 
 // 登录表单数据
 const loginForm = ref({
-  username: '',
-  password: '',
+  username: 'user',
+  password: 'user',
   role: '用户' // 默认为学员
 })
 
@@ -34,13 +34,13 @@ const handleLogin = async (e) => {
     // 根据选择的身份调用不同的API
     switch(role) {
       case '用户':
-        res = await userLogin({ loginName: username, password: password })
+        res = await userLogin({ username: username, password: password })
         break
       case '商家':
-        res = await merchantLogin({ loginName: username, password: password })
+        res = await merchantLogin({ username: username, password: password })
         break
       case '管理员':
-        res = await adminLogin({ loginName: username, password: password })
+        res = await adminLogin({ username: username, password: password })
         break
       default:
         throw new Error('未知用户身份')
@@ -53,7 +53,7 @@ const handleLogin = async (e) => {
       // 根据身份跳转到不同页面
       switch(role) {
         case '用户':
-          router.push({ path: '/user/dashboard' })
+          router.push({ path: 'user/NearbySearch' })
           break
         case '商家':
           router.push({ path: '/merchant/dashboard' })
