@@ -90,7 +90,7 @@ const handleCommand = (command) => {
           </el-icon>
           <span>用户评论</span>
         </el-menu-item>
-        <el-sub-menu>
+        <el-sub-menu index="/user/UserPersonalize">
           <template #title>
             <el-icon>
               <UserFilled/>
@@ -103,7 +103,7 @@ const handleCommand = (command) => {
             </el-icon>
             <span>账户信息</span>
           </el-menu-item>
-          <el-menu-item index="/user/UserSetting">
+          <el-menu-item index="/user/UserPrivacy">
             <el-icon>
               <EditPen/>
             </el-icon>

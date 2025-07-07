@@ -16,11 +16,12 @@ import MerchantManagement from "@/views/administator/MerchantManagement.vue";
 import DataAnalysis from "@/views/administator/DataAnalysis.vue";
 import UserMainPage from "@/views/user/UserMainPage.vue";
 import MerchantMainPage from "@/views/merchant/MerchantMainPage.vue";
+import UserPersonalize from "@/views/user/UserPersonalize.vue";
 
 
 const routes = [
   // 登录页
-  { path: '/login', component: Login },
+  { path: '/login', component: Login},
 
   // 根路径，根据角色重定向到不同布局
   {
@@ -36,7 +37,9 @@ const routes = [
           { path: 'NearbySearch', component: NearbySearch }, //附近搜索界面
           { path: 'FavoritesManagement', component: FavoritesManagement }, //收藏管理界面
           { path: 'UserComment', component: UserComment }, //用户评论界面
-          { path: 'UserSetting', component: UserSetting } //账户设置界面
+          { path: 'UserSetting', component: UserSetting },//账户设置界面
+          { path: 'UserPersonalize', component: UserPersonalize }, //用户个性化界面
+          { path: 'UserPrivacy', component: UserPrivacy }, //用户评论界面
         ]
       },
       // 商家模块
