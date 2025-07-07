@@ -1,5 +1,5 @@
 <script setup>
-import { useRouter } from 'vue-router';
+import {useRouter } from 'vue-router';
 import {ElMessage} from "element-plus";
 import {adminLogin, merchantLogin, userLogin} from "../api/api";
 import {onMounted, ref} from 'vue';

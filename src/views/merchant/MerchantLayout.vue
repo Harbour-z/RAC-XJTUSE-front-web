@@ -15,7 +15,7 @@ import {userInfoService} from "@/api/user";
 import {useUserInfoStore} from "@/stores/userInfo";
 import {useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {getCurUser} from "../api/api";
+import {getCurUser} from "@/api/api";
 const userInfoStore = useUserInfoStore();
 
 //getCurUser
