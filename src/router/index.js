@@ -14,8 +14,8 @@ import MerchantSetting from "@/views/merchant/MerchantSetting.vue";
 import UserManagement from "@/views/administator/UserManagement.vue";
 import MerchantManagement from "@/views/administator/MerchantManagement.vue";
 import DataAnalysis from "@/views/administator/DataAnalysis.vue";
-
-
+import UserMainPage from "@/views/user/UserMainPage.vue";
+import MerchantMainPage from "@/views/merchant/MerchantMainPage.vue";
 
 
 const routes = [
@@ -32,6 +32,7 @@ const routes = [
         path: '/user',
         component: UserLayout,
         children: [
+          { path: 'UserMainPage', component: UserMainPage }, //用户主页界面
           { path: 'NearbySearch', component: NearbySearch }, //附近搜索界面
           { path: 'FavoritesManagement', component: FavoritesManagement }, //收藏管理界面
           { path: 'UserComment', component: UserComment }, //用户评论界面
@@ -43,6 +44,7 @@ const routes = [
         path: '/merchant',
         component: MerchantLayout,
         children: [
+          { path: 'MerchantMainPage', component: MerchantMainPage }, //商家主页界面
           { path: 'MerchantRegister', component: MerchantRegister }, //商家注册界面
           { path: 'FansInteract', component: FansInteract }, // 粉丝互动界面
           { path: 'MerchantComment', component: MerchantComment }, // 商家评论界面

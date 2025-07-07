@@ -2,16 +2,16 @@
 
 import {
   CaretBottom,
-  Crop,
-  EditPen, Goods,
-  Management,
+  EditPen,
+  House,
+  MessageBox,
   Promotion,
+  StarFilled,
   SwitchButton,
   User,
   UserFilled
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
-import {userInfoService} from "@/api/user";
 import {useUserInfoStore} from "@/stores/userInfo";
 import {useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
@@ -66,36 +66,48 @@ const handleCommand = (command) => {
       <div class="el-aside__logo"></div>
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/user/list">
+        <el-menu-item index="/user/UserMainPage">
+          <el-icon>
+            <House />
+          </el-icon>
+          <span>用户主页</span>
+        </el-menu-item>
+        <el-menu-item index="/user/NearbySearch">
           <el-icon>
             <Promotion/>
           </el-icon>
-          <span>用户管理</span>
+          <span>附近搜索</span>
         </el-menu-item>
-        <el-menu-item index="/user/count">
+        <el-menu-item index="/user/FavoritesManagement">
           <el-icon>
-            <User />
+            <StarFilled />
           </el-icon>
-          <span>用户统计</span>
+          <span>收藏管理</span>
+        </el-menu-item>
+        <el-menu-item index="/user/UserComment">
+          <el-icon>
+            <MessageBox />
+          </el-icon>
+          <span>用户评论</span>
         </el-menu-item>
         <el-sub-menu>
           <template #title>
             <el-icon>
               <UserFilled/>
             </el-icon>
-            <span>个人中心</span>
+            <span>个性化设置</span>
           </template>
-          <el-menu-item index="/user/info">
+          <el-menu-item index="/user/UserSetting">
             <el-icon>
               <User/>
             </el-icon>
-            <span>基本资料</span>
+            <span>账户信息</span>
           </el-menu-item>
-          <el-menu-item index="/user/resetPassword">
+          <el-menu-item index="/user/UserSetting">
             <el-icon>
               <EditPen/>
             </el-icon>
-            <span>重置密码</span>
+            <span>隐私设置</span>
           </el-menu-item>
         </el-sub-menu>
       </el-menu>
@@ -126,7 +138,7 @@ const handleCommand = (command) => {
         <router-view/>
       </el-main>
       <!-- 底部区域 -->
-      <el-footer>后台管理系统 ©2024 </el-footer>
+      <el-footer>商品选择系统 ©2025 </el-footer>
     </el-container>
   </el-container>
 </template>
@@ -140,7 +152,7 @@ const handleCommand = (command) => {
 
     &__logo {
       height: 120px;
-      background: url('../assets/login_title.png') no-repeat center / 120px auto;
+      background: url('@/assets/login_title.png') no-repeat center / 120px auto;
     }
 
     .el-menu {

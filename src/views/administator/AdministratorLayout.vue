@@ -126,7 +126,7 @@ const handleCommand = (command) => {
         <router-view/>
       </el-main>
       <!-- 底部区域 -->
-      <el-footer>后台管理系统 ©2024 </el-footer>
+      <el-footer>商家管理系统 ©2024 </el-footer>
     </el-container>
   </el-container>
 </template>
@@ -140,7 +140,7 @@ const handleCommand = (command) => {
 
     &__logo {
       height: 120px;
-      background: url('../assets/login_title.png') no-repeat center / 120px auto;
+      background: url('') no-repeat center / 120px auto;
     }
 
     .el-menu {
