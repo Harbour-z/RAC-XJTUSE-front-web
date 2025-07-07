@@ -8,9 +8,9 @@ const router = useRouter()
 
 // 登录表单数据
 const loginForm = ref({
-  username: 'user',
-  password: 'user',
-  role: '用户' // 默认为学员
+  account: '',
+  password: '',
+  role: '用户'
 })
 
 // 注册表单数据
@@ -23,24 +23,27 @@ const registerForm = ref({
 const handleLogin = async (e) => {
   e.preventDefault()
 
-  if (!loginForm.value.username || !loginForm.value.password) {
-    ElMessage.warning('请输入用户名和密码')
+  if (!loginForm.value.account || !loginForm.value.password) {
+    ElMessage.warning('请输入账号和密码')
     return
   }
 
   try {
     let res
-    const { username, password, role } = loginForm.value
+    const { account, password, role } = loginForm.value
     // 根据选择的身份调用不同的API
     switch(role) {
       case '用户':
-        res = await userLogin({ username: username, password: password })
+        res = await userLogin({
+          account: account,
+          password: password
+        })
         break
       case '商家':
-        res = await merchantLogin({ username: username, password: password })
+        res = await merchantLogin({ account: account, password: password })
         break
       case '管理员':
-        res = await adminLogin({ username: username, password: password })
+        res = await adminLogin({ account: account, password: password })
         break
       default:
         throw new Error('未知用户身份')
@@ -53,13 +56,13 @@ const handleLogin = async (e) => {
       // 根据身份跳转到不同页面
       switch(role) {
         case '用户':
-          router.push({ path: 'user/NearbySearch' })
+          router.push({ path: '/user/NearbySearch' })
           break
         case '商家':
-          router.push({ path: '/merchant/dashboard' })
+          router.push({ path: '/merchant/MerchantRegister' })
           break
         case '管理员':
-          router.push({ path: '/admin/dashboard' })
+          router.push({ path: '/admin/UserManagement' })
           break
       }
     }
@@ -107,7 +110,7 @@ const radio = ref("用户")
           <h2 class="title">Sign in</h2>
           <div class="input-field">
             <i class="fas fa-user"></i>
-            <input v-model="loginForm.username" type="text" placeholder="Username" required/>
+            <input v-model="loginForm.account" type="text" placeholder="Username/Phone/Email" required/>
           </div>
           <div class="input-field">
             <i class="fas fa-lock"></i>
