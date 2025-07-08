@@ -15,4 +15,4 @@ import request from "@/utils/request";
 // 获取商家评价 GET    /api/merchants/reviews
 // 回复评价 POST   /api/merchants/replies/{reviewId}
 
-// 个性化 POST   /api/users/<多个api>
+// 个性化 POST   /api/merchants/<多个api>

@@ -1,7 +1,7 @@
 <script setup>
 import {useRouter } from 'vue-router';
 import {ElMessage} from "element-plus";
-import {adminLogin, merchantLogin, userLogin} from "../api/api";
+import {adminLogin, merchantLogin, userLogin,userRegister,merchantRegister} from "../api/api";
 import {onMounted, ref} from 'vue';
 
 const router = useRouter()
@@ -15,11 +15,39 @@ const loginForm = ref({
 
 // 注册表单数据
 const registerForm = ref({
+  role: 'user', // 'user' 或 'merchant'
   username: '',
+  password: '',
+  confirmPassword: '',
   phone: '',
-  email: '',
-  password: ''
+  email: ''
 })
+
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+
+const validatePassword = (rule, value, callback) => {
+  if (value !== registerForm.value.password) {
+    callback(new Error('两次输入的密码不一致'));
+  } else {
+    callback();
+  }
+};
+
+const rules = {
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    { min: 4, max: 16, message: '长度在4到16个字符', trigger: 'blur' }
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, max: 20, message: '长度在6到20个字符', trigger: 'blur' }
+  ],
+  confirmPassword: [
+    { required: true, message: '请确认密码', trigger: 'blur' },
+    { validator: validatePassword, trigger: 'blur' }
+  ]
+}
 
 const handleLogin = async (e) => {
   e.preventDefault()
@@ -72,10 +100,57 @@ const handleLogin = async (e) => {
   }
 }
 
-// 注册功能保持不变
-const handleRegister = (e) => {
+const handleRegister = async (e) => {
   e.preventDefault()
-  ElMessage.info('注册功能待实现')
+
+  try {
+    // 检查必填字段
+    if (!registerForm.value.username || !registerForm.value.password) {
+      ElMessage.warning('用户名和密码为必填项');
+      return;
+    }
+
+    // 检查密码一致性
+    if (registerForm.value.password !== registerForm.value.confirmPassword) {
+      ElMessage.warning('两次输入的密码不一致');
+      return;
+    }
+
+    // 准备注册数据
+    const registerData = {
+      username: registerForm.value.username,
+      password: registerForm.value.password,
+      phone: registerForm.value.phone || undefined,
+      email: registerForm.value.email || undefined
+    };
+
+    // 根据角色调用不同API
+    let res;
+    if (registerForm.value.role === 'user') {
+      res = await userRegister(registerData);
+    } else {
+      res = await merchantRegister(registerData);
+    }
+
+    if (res.success) {
+      ElMessage.success('注册成功');
+      // 自动切换到登录界面
+      container.classList.remove("sign-up-mode");
+      // 清空注册表单
+      registerForm.value = {
+        role: 'user',
+        username: '',
+        password: '',
+        confirmPassword: '',
+        phone: '',
+        email: ''
+      };
+    } else {
+      ElMessage.error(res.message || '注册失败');
+    }
+  } catch (error) {
+    ElMessage.error(`注册失败: ${error.message}`);
+  }
 }
 
 let container, signInBtn, signUpBtn
@@ -84,7 +159,6 @@ onMounted(() => {
   signInBtn = document.querySelector("#sign-in-btn")
   signUpBtn = document.querySelector("#sign-up-btn")
 
-  // 添加更可靠的事件监听
   if (signUpBtn) {
     signUpBtn.addEventListener("click", () => {
       container.classList.add("sign-up-mode")
@@ -97,7 +171,6 @@ onMounted(() => {
     })
   }
 })
-
 </script>
 
 <template>
@@ -119,25 +192,40 @@ onMounted(() => {
             <el-radio value="商家">商家</el-radio>
             <el-radio value="管理员">管理员</el-radio>
           </el-radio-group>
-          <input  type="submit" value="Login" class="btn solid" />
+          <input type="submit" value="Login" class="btn solid" />
         </form>
+
         <form action="#" class="sign-up-form" @submit="handleRegister">
           <h2 class="title">Sign up</h2>
+          <div class="role-selection">
+            <el-radio-group v-model="registerForm.role">
+              <el-radio label="user" size="large">用户</el-radio>
+              <el-radio label="merchant" size="large">商家</el-radio>
+            </el-radio-group>
+          </div>
           <div class="input-field">
             <i class="fas fa-user"></i>
-            <input v-model="registerForm.username" type="text" placeholder="Username" />
+            <input v-model="registerForm.username" type="text" placeholder="用户名" required />
           </div>
-          <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input v-model="registerForm.phone" type="text" placeholder="Phone" />
-          </div>
-          <div class="input-field">
-            <i class="fas fa-envelope"></i>
-            <input v-model="registerForm.email" type="email" placeholder="Email" />
-          </div>
+
           <div class="input-field">
             <i class="fas fa-lock"></i>
-            <input v-model="registerForm.password" type="password" placeholder="Password" />
+            <input v-model="registerForm.password" type="password" placeholder="密码" required />
+          </div>
+
+          <div class="input-field">
+            <i class="fas fa-lock"></i>
+            <input v-model="registerForm.confirmPassword" type="password" placeholder="确认密码" required />
+          </div>
+
+          <div class="input-field">
+            <i class="fas fa-phone"></i>
+            <input v-model="registerForm.phone" type="text" placeholder="手机号（可选）" />
+          </div>
+
+          <div class="input-field">
+            <i class="fas fa-envelope"></i>
+            <input v-model="registerForm.email" type="email" placeholder="邮箱（可选）" />
           </div>
           <input type="submit" class="btn" value="Sign up" />
         </form>
@@ -173,12 +261,13 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="scss" scoped >
- * {
-   margin: 0;
-   padding: 0;
-   box-sizing: border-box;
- }
+<style lang="scss" scoped>
+/* Your existing CSS remains unchanged */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 body,
 input {
   font-family: sans-serif;
