@@ -7,14 +7,15 @@ export const getMerchantInfo = (query) => request.get(' /api/merchantInfo/getInf
 // 更新商家信息 POST    /api/merchants/updateInfo
 export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/updateInfo',query);
 
-// 获取商品列表 GET    /api/merchants/getProducts
-export const getProducts = (query) => request.get('/api/merchantInfo/getProducts',query);
-// 添加商品 POST   /api/merchants/addProducts
-export const addProducts = (query) => request.post('/api/merchantInfo/addProducts',query);
-// 更新商品 POST    /api/merchants/products/{productId}
-export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/updateinfo',query);
-// 删除商品 DELETE /api/merchants/products/{productId}
-export const updateMerchantInfo = (query) => request.delete('/api/merchantInfo/updateinfo',query);
+//不知道要不要加商品
+// // 获取商品列表 GET    /api/merchants/getProducts
+// export const getProducts = (query) => request.get('/api/merchantInfo/getProducts',query);
+// // 添加商品 POST   /api/merchants/addProducts
+// export const addProducts = (query) => request.post('/api/merchantInfo/addProducts',query);
+// // 更新商品 POST    /api/merchants/products/{productId}
+// export const updateProduct = (query) => request.post('/api/merchantInfo/updateinfo',query);
+// // 删除商品 DELETE /api/merchants/products/{productId}
+// export const updateMerchantInfo = (query) => request.delete('/api/merchantInfo/updateinfo',query);
 
 
 
