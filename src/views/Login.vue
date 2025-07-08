@@ -16,6 +16,7 @@ const loginForm = ref({
 // 注册表单数据
 const registerForm = ref({
   username: '',
+  phone: '',
   email: '',
   password: ''
 })
@@ -56,10 +57,10 @@ const handleLogin = async (e) => {
       // 根据身份跳转到不同页面
       switch(role) {
         case '用户':
-          router.push({ path: '/user/NearbySearch' })
+          router.push({ path: '/user/UserMainPage' })
           break
         case '商家':
-          router.push({ path: '/merchant/MerchantRegister' })
+          router.push({ path: '/merchant/MerchantMainPage' })
           break
         case '管理员':
           router.push({ path: '/admin/UserManagement' })
@@ -78,7 +79,6 @@ const handleRegister = (e) => {
 }
 
 let container, signInBtn, signUpBtn
-
 onMounted(() => {
   container = document.querySelector(".container")
   signInBtn = document.querySelector("#sign-in-btn")
@@ -97,8 +97,6 @@ onMounted(() => {
     })
   }
 })
-
-const radio = ref("用户")
 
 </script>
 
@@ -128,6 +126,10 @@ const radio = ref("用户")
           <div class="input-field">
             <i class="fas fa-user"></i>
             <input v-model="registerForm.username" type="text" placeholder="Username" />
+          </div>
+          <div class="input-field">
+            <i class="fas fa-envelope"></i>
+            <input v-model="registerForm.phone" type="text" placeholder="Phone" />
           </div>
           <div class="input-field">
             <i class="fas fa-envelope"></i>
