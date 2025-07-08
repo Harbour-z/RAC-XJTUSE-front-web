@@ -9,11 +9,15 @@ export const removeById = (user) => request.get('/api/user/removeUser',{params:u
 
 // 待审核商家列表 GET    /api/admin/merchants/pending
 
+
 // 批准商家 POST    /api/admin/merchants/{id}/approve
+
 
 // 拒绝商家 POST    /api/admin/merchants/{id}/reject
 
+
 // 下架商家 DELETE /api/admin/merchants/{id}
+
 
 // 删除违规评价 DELETE /api/admin/reviews/{reviewId}
 
