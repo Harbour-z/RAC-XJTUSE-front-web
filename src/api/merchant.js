@@ -21,6 +21,7 @@ export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/upd
 
 
 // 获取商家评价 GET    /api/merchants/reviews
-// 回复评价 POST   /api/merchants/replies/{reviewId}
-
-// 个性化 POST   /api/merchants/<多个api>
+export const getReview = (query) => request.post('/api/merchantInfo/reviews',query);
+// 回复评价 POST   /api/merchants/replies
+export const replyReview = (query) => request.post('/api/merchantInfo/replies',query);
+// 个性化 POST   /api/merchants/<多个api>（先不管）
