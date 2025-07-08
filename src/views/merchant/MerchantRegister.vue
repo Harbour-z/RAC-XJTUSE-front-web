@@ -3,8 +3,9 @@ import { reactive } from 'vue'
 
 // do not use same name with ref
 const form = reactive({
-  name: '',
-  region: '',
+  address: '',
+  logitude: '',
+  latitude:'',
   date1: '',
   date2: '',
   delivery: false,
@@ -16,6 +17,60 @@ const form = reactive({
 const onSubmit = () => {
   console.log('submit!')
 }
+
+
+//图片列的
+import { ref } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+
+import type { UploadProps, UploadUserFile } from 'element-plus'
+
+const fileList = ref<UploadUserFile[]>([
+  {
+    name: 'food.jpeg',
+    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+  },
+  {
+    name: 'plant-1.png',
+    url: '/images/plant-1.png',
+  },
+  {
+    name: 'food.jpeg',
+    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+  },
+  {
+    name: 'plant-2.png',
+    url: '/images/plant-2.png',
+  },
+  {
+    name: 'food.jpeg',
+    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+  },
+  {
+    name: 'figure-1.png',
+    url: '/images/figure-1.png',
+  },
+  {
+    name: 'food.jpeg',
+    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
+  },
+  {
+    name: 'figure-2.png',
+    url: '/images/figure-2.png',
+  },
+])
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+  console.log(uploadFile, uploadFiles)
+}
+
+const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+  dialogImageUrl.value = uploadFile.url!
+  dialogVisible.value = true
+}
 </script>
 
 <template>
@@ -24,8 +79,10 @@ const onSubmit = () => {
       <el-header><h2 class="txt-style-mega-light txt-block-title__title">现在开始注册属于你的店铺！</h2></el-header>
       <el-main>
         <el-form :model="form" label-width="auto" style="max-width: 600px">
-          <el-form-item label="Activity name">
-            <el-input v-model="form.name" />
+          <el-form-item label="店面地址">
+            <el-input v-model="form.address" placeholder="请输入店面地址" />
+            <el-input v-model="form.logitude" placeholder="经度" />
+            <el-input v-model="form.latitude" placeholder="纬度" />
           </el-form-item>
           <el-form-item label="合格证表">
             <el-upload

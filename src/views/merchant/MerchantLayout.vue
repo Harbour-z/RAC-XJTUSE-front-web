@@ -17,21 +17,6 @@ import {ElMessage, ElMessageBox} from "element-plus";
 import {getCurUser} from "@/api/user";
 const userInfoStore = useUserInfoStore();
 
-//getCurUser
-const getUserInfo = ()=>{
-  getCurUser().then(res => {
-    if(!res.data){
-      ElMessage({
-        message:'未登入',
-        type:'warning'
-      })
-      router.push({path:'/login'})
-    }else{
-      userInfoStore.setUserInfo(res.data)
-    }
-  })
-}
-getUserInfo()
 
 const router = useRouter();
 const handleCommand = (command) => {
