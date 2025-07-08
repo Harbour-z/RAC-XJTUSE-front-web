@@ -95,7 +95,7 @@ const handleCommand = (command) => {
             <el-icon>
               <UserFilled/>
             </el-icon>
-            <span>个性化设置</span>
+            <span>个性化</span>
           </template>
           <el-menu-item index="/user/UserSetting">
             <el-icon>

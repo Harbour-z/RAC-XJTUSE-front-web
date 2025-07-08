@@ -17,6 +17,7 @@ import DataAnalysis from "@/views/administator/DataAnalysis.vue";
 import UserMainPage from "@/views/user/UserMainPage.vue";
 import MerchantMainPage from "@/views/merchant/MerchantMainPage.vue";
 import UserPersonalize from "@/views/user/UserPersonalize.vue";
+import UserPrivacy from "@/views/user/UserPrivacy.vue";
 
 
 const routes = [
