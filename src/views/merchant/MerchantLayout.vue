@@ -47,7 +47,6 @@ const handleCommand = (command) => {
         }
     ).then(
         async () => {
-          // clear data in pinia
           userInfoStore.removeUserInfo()
           ElMessage.success("退出成功")
           await router.push('/login')
