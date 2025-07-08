@@ -14,8 +14,22 @@ import avatar from '@/assets/default.png'
 import {useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {useMerchantInfoStore} from "@/stores/merchantInfo";
+import {getCurMerchantInfo} from "@/api/merchant";
+//欢迎后的用户名实现
 const merchantInfoStore = useMerchantInfoStore();
-
+getCurMerchantInfo().then(
+    res => {
+      if(!res.data){
+        ElMessage({
+          message:'未登入',
+          type:'warning'
+        })
+        router.push({path:'/login'})
+      }else{
+        merchantInfoStore.setMerchantInfo(res.data)
+      }
+    }
+)
 
 const router = useRouter();
 const handleCommand = (command) => {
