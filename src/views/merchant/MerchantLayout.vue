@@ -11,11 +11,10 @@ import {
   User,
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
-import {useUserInfoStore} from "@/stores/userInfo";
 import {useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {getCurUser} from "@/api/user";
-const userInfoStore = useUserInfoStore();
+import {useMerchantInfoStore} from "@/stores/merchantInfo";
+const merchantInfoStore = useMerchantInfoStore();
 
 
 const router = useRouter();
@@ -32,7 +31,7 @@ const handleCommand = (command) => {
     ).then(
         async () => {
           // clear data in pinia
-          userInfoStore.removeUserInfo()
+          merchantInfoStore.removeMerchantInfo()
           ElMessage.success("退出成功")
           await router.push('/login')
         }
@@ -86,18 +85,18 @@ const handleCommand = (command) => {
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>欢迎：<strong>{{ userInfoStore.userInfo.loginName }}</strong></div>
+        <div>欢迎：<strong>{{ merchantInfoStore.merchantInfo }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
-                        <el-avatar :src="userInfoStore.userInfo.avatar?userInfoStore.userInfo.avater:avatar"/>
+                        <el-avatar :src="merchantInfoStore.merchantInfo.avatar?merchantInfoStore.merchantInfo.avater:avatar"/>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>
                     </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="info" :icon="User">基本资料</el-dropdown-item>
-              <el-dropdown-item command="resetPassword" :icon="EditPen">重置密码</el-dropdown-item>
+<!--            主页都有了应该没必要再加一个这个  <el-dropdown-item command="info" :icon="User">基本资料</el-dropdown-item>-->
+<!--              <el-dropdown-item command="resetPassword" :icon="EditPen">重置密码</el-dropdown-item>-->
               <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
