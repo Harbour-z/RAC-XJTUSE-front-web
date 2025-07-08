@@ -54,7 +54,7 @@ const handleCommand = (command) => {
         }
     )
   } else {
-    router.push('/user/' + command)
+    router.push('/admin/' + command)
   }
 }
 </script>
@@ -66,19 +66,19 @@ const handleCommand = (command) => {
       <div class="el-aside__logo"></div>
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/user/UserManagement">
+        <el-menu-item index="/admin/UserManagement">
           <el-icon>
             <Promotion/>
           </el-icon>
           <span>用户管理</span>
         </el-menu-item>
-        <el-menu-item index="/user/MerchantManagement">
+        <el-menu-item index="/admin/MerchantManagement">
           <el-icon>
             <User />
           </el-icon>
           <span>商家管理</span>
         </el-menu-item>
-        <el-menu-item index="/user/DataAnalysis">
+        <el-menu-item index="/admin/DataAnalysis">
           <el-icon>
             <User />
           </el-icon>
@@ -112,7 +112,7 @@ const handleCommand = (command) => {
         <router-view/>
       </el-main>
       <!-- 底部区域 -->
-      <el-footer>商家管理系统 ©2024 </el-footer>
+      <el-footer>小众点评管理系统 ©2025 </el-footer>
     </el-container>
   </el-container>
 </template>

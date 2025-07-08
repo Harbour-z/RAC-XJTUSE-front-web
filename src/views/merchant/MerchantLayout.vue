@@ -54,7 +54,7 @@ const handleCommand = (command) => {
         }
     )
   } else {
-    router.push('/user/' + command)
+    router.push('/merchant/' + command)
   }
 }
 </script>
@@ -66,19 +66,19 @@ const handleCommand = (command) => {
       <div class="el-aside__logo"></div>
       <el-menu active-text-color="#ffd04b" background-color="#232323" text-color="#fff"
                router>
-        <el-menu-item index="/user/MerchantMainPage">
+        <el-menu-item index="/merchant/MerchantMainPage">
           <el-icon>
             <Promotion/>
           </el-icon>
           <span>商家主页</span>
         </el-menu-item>
-        <el-menu-item index="/user/MerchantSetting">
+        <el-menu-item index="/merchant/MerchantSetting">
           <el-icon>
             <EditPen/>
           </el-icon>
           <span>商家设置</span>
         </el-menu-item>
-        <el-menu-item index="/user/MerchantRegister">
+        <el-menu-item index="/merchant/MerchantRegister">
           <el-icon>
             <User />
           </el-icon>
@@ -91,7 +91,7 @@ const handleCommand = (command) => {
             </el-icon>
             <span>粉丝互动</span>
           </template>
-          <el-menu-item index="/user/MerchantComment">
+          <el-menu-item index="/merchant/MerchantComment">
             <el-icon>
               <User/>
             </el-icon>
