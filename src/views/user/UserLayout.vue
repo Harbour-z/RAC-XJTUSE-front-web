@@ -9,13 +9,12 @@ import {
   StarFilled,
   SwitchButton,
   User,
-  UserFilled
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import {useUserInfoStore} from "@/stores/userInfo";
 import {useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {getCurUser} from "@/api/api";
+import {getCurUser} from "@/api/user";
 const userInfoStore = useUserInfoStore();
 
 //getCurUser
