@@ -11,9 +11,10 @@ export const updateUser = (user) => request.post('/api/user/updateUser', user)
 
 // 注销账户 DELETE /api/users/me
 
-// 收藏商家 POST   /api/users/favorites/{merchantId}
-// 取消收藏 DELETE /api/users/favorites/{merchantId}
-// 获取收藏列表 GET    /api/users/favorites
-// 提交评价 POST   /api/users/reviews
-// 获取我的评价 GET    /api/users/reviews
-// 个性化 POST   /api/users/<多个api>
+// 收藏商家 POST   /api/user/favorites/{merchantId}
+// 取消收藏 DELETE /api/user/favorites/{merchantId}
+// 获取收藏列表 GET    /api/user/favorites
+
+// 提交评价 POST   /api/user/reviews
+// 获取我的评价 GET    /api/user/reviews
+// 个性化 POST   /api/user/<多个api>
