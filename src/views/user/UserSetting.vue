@@ -12,10 +12,13 @@
 
 <template>
   <div class="user-profile-settings-container">
-    <div class="settings-header">
-      <h1 class="text-2xl font-bold mb-4">账户设置</h1>
-      <p class="text-gray-500 mb-6">自定义您的个人信息和隐私设置</p>
-    </div>
+    <el-card>
+      <div class="settings-header">
+        <h1 class="text-2xl font-bold mb-4">账户设置</h1>
+        <p class="text-gray-500 mb-6">自定义您的个人信息和隐私设置</p>
+      </div>
+    </el-card>
+
 
     <div class="settings-content grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- 左侧：个人信息表单 -->
@@ -50,7 +53,7 @@
           <div>
             <label class="block text-gray-700 font-medium mb-1">昵称</label>
             <input type="text" placeholder="请输入您的昵称" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <!-- 这里需要补充：昵称验证逻辑和错误提示 -->
+            <!-- 这里可能需要补充：昵称验证逻辑和错误提示 -->
           </div>
 
           <div>
