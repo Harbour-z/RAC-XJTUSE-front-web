@@ -324,23 +324,23 @@ const submitForm = () => {
             </el-form>
           </el-card>
 
-          <!-- 其他设置 -->
-          <el-card class="bg-white rounded-xl shadow-md p-6">
-            <template #header>
-              <h2 class="text-xl font-semibold">其他设置</h2>
-            </template>
-            <el-form :model="otherSettings" label-width="120px">
-              <el-form-item label="接受在线预订">
-                <el-switch v-model="otherSettings.acceptOnlineBooking"></el-switch>
-              </el-form-item>
-              <el-form-item label="接受外卖订单">
-                <el-switch v-model="otherSettings.acceptTakeoutOrders"></el-switch>
-              </el-form-item>
-              <el-form-item label="显示在推荐列表">
-                <el-switch v-model="otherSettings.showInRecommendList"></el-switch>
-              </el-form-item>
-            </el-form>
-          </el-card>
+          <!-- 其他设置 看着似乎不用-->
+<!--          <el-card class="bg-white rounded-xl shadow-md p-6">-->
+<!--            <template #header>-->
+<!--              <h2 class="text-xl font-semibold">其他设置</h2>-->
+<!--            </template>-->
+<!--            <el-form :model="otherSettings" label-width="120px">-->
+<!--              <el-form-item label="接受在线预订">-->
+<!--                <el-switch v-model="otherSettings.acceptOnlineBooking"></el-switch>-->
+<!--              </el-form-item>-->
+<!--              <el-form-item label="接受外卖订单">-->
+<!--                <el-switch v-model="otherSettings.acceptTakeoutOrders"></el-switch>-->
+<!--              </el-form-item>-->
+<!--              <el-form-item label="显示在推荐列表">-->
+<!--                <el-switch v-model="otherSettings.showInRecommendList"></el-switch>-->
+<!--              </el-form-item>-->
+<!--            </el-form>-->
+<!--          </el-card>-->
         </el-col>
       </el-row>
     </div>

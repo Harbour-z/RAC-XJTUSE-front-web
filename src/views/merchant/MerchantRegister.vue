@@ -6,12 +6,10 @@ const form = reactive({
   address: '',
   logitude: '',
   latitude:'',
-  date1: '',
-  date2: '',
-  delivery: false,
+  merchantName: '',
+  licenseNumber: '',
   type: [],
-  resource: '',
-  desc: '',
+  description: '',
 })
 
 const onSubmit = () => {
@@ -71,6 +69,30 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
+
+//自适应输入框
+const textarea2 = ref('')
+
+//许可证图片栏
+import { ElMessage } from 'element-plus'
+const imageUrl = ref('')
+const handleAvatarSuccess: UploadProps['onSuccess'] = (
+    response,
+    uploadFile
+) => {
+  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+}
+
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg') {
+    ElMessage.error('Avatar picture must be JPG format!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    return false
+  }
+  return true
+}
 </script>
 
 <template>
@@ -84,7 +106,25 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
             <el-input v-model="form.logitude" placeholder="经度" />
             <el-input v-model="form.latitude" placeholder="纬度" />
           </el-form-item>
-          <el-form-item label="合格证表">
+          <el-form-item label="负责人">
+            <el-input v-model="form.merchantName" placeholder="请输入店铺负责人姓名" />
+          </el-form-item>
+          <el-form-item label="营业许可编号">
+            <el-input v-model="form.licenseNumber" placeholder="请输入对应的营业许可编号" />
+          </el-form-item>
+          <el-form-item label="许可证图片">
+            <el-upload
+              class="avatar-uploader"
+              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+              :show-file-list="false"
+              :on-success="handleAvatarSuccess"
+              :before-upload="beforeAvatarUpload"
+          >
+            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+          </el-upload>
+          </el-form-item>
+          <el-form-item label="其它许可证照片">
             <el-upload
                 v-model:file-list="fileList"
                 action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
@@ -99,35 +139,41 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
               <img w-full :src="dialogImageUrl" alt="Preview Image" />
             </el-dialog>
           </el-form-item>
-          <el-form-item label="Activity zone">
-            <el-select v-model="form.region" placeholder="please select your zone">
-              <el-option label="Zone one" value="shanghai" />
-              <el-option label="Zone two" value="beijing" />
-            </el-select>
+          <el-form-item label="卫生许可证图片">
+            <el-upload
+                class="avatar-uploader"
+                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+            >
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
           </el-form-item>
-          <el-form-item label="Activity time">
-            <el-col :span="11">
-              <el-date-picker
-                  v-model="form.date1"
-                  type="date"
-                  placeholder="Pick a date"
-                  style="width: 100%"
-              />
-            </el-col>
-            <el-col :span="2" class="text-center">
-              <span class="text-gray-500">-</span>
-            </el-col>
-            <el-col :span="11">
-              <el-time-picker
-                  v-model="form.date2"
-                  placeholder="Pick a time"
-                  style="width: 100%"
-              />
-            </el-col>
-          </el-form-item>
-          <el-form-item label="是否接受外卖订单">
-            <el-switch v-model="form.delivery" />
-          </el-form-item>
+<!--      注释功能暂时弃置    <el-form-item label="Activity time">-->
+<!--            <el-col :span="11">-->
+<!--              <el-date-picker-->
+<!--                  v-model="form.date1"-->
+<!--                  type="date"-->
+<!--                  placeholder="Pick a date"-->
+<!--                  style="width: 100%"-->
+<!--              />-->
+<!--            </el-col>-->
+<!--            <el-col :span="2" class="text-center">-->
+<!--              <span class="text-gray-500">-</span>-->
+<!--            </el-col>-->
+<!--            <el-col :span="11">-->
+<!--              <el-time-picker-->
+<!--                  v-model="form.date2"-->
+<!--                  placeholder="Pick a time"-->
+<!--                  style="width: 100%"-->
+<!--              />-->
+<!--            </el-col>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="是否接受外卖订单">-->
+<!--            <el-switch v-model="form.delivery" />-->
+<!--          </el-form-item>-->
           <el-form-item label="商品类别">
             <el-checkbox-group v-model="form.type">
               <el-checkbox value="中餐" name="type">
@@ -147,14 +193,14 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
               </el-checkbox>
             </el-checkbox-group>
           </el-form-item>
-          <el-form-item label="Resources">
-            <el-radio-group v-model="form.resource">
-              <el-radio value="Sponsor">Sponsor</el-radio>
-              <el-radio value="Venue">Venue</el-radio>
-            </el-radio-group>
-          </el-form-item>
-          <el-form-item label="Activity form">
-            <el-input v-model="form.desc" type="textarea" />
+          <el-form-item label="对店铺的描述">
+            <el-input
+                v-model="form.description"
+                style="width: 240px"
+                :autosize="{ minRows: 2, maxRows: 4 }"
+                type="textarea"
+                placeholder="在这里输入对您店面的描述"
+            />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">Create</el-button>
@@ -168,4 +214,29 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 
 <style scoped lang="scss">
 
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
 </style>
