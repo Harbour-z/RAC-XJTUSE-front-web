@@ -1,24 +1,100 @@
 <script setup lang="ts">
-// 这里需要补充：
-// 1. 导入必要的依赖和组件
-// 2. 定义表单数据模型（头像、签名、昵称、性别、生日等）
-// 3. 实现头像上传功能（包括本地相册上传和系统模板选择）
-// 4. 实现表单验证逻辑
-// 5. 实现隐私选项的状态管理
-// 6. 实现提交表单的方法
-// 7. 实现重置表单的方法
-// 8. 处理与后端API的交互逻辑
+import { ref } from 'vue';
+import { ElMessage } from 'element-plus';
+
+// 表单数据模型
+const formData = ref({
+  avatar: '',
+  nickname: '',
+  signature: '',
+  gender: 'other',
+  birthday: null
+});
+
+// 隐私设置状态
+const privacySettings = ref({
+  profileVisibility: 'everyone',
+  collectionVisibility: 'everyone',
+  commentVisibility: 'everyone',
+  activeStatus: true
+});
+
+// 表单验证规则
+const rules = ref({
+  nickname: [
+    { required: true, message: '请输入昵称', trigger: 'blur' }
+  ],
+  signature: [
+    { max: 200, message: '签名长度不能超过200个字符', trigger: 'blur' }
+  ]
+});
+
+// 表单引用
+const formRef = ref(null);
+
+// 上传接口地址，需根据实际情况修改
+const uploadUrl = 'https://example.com/upload';
+
+// 头像上传成功处理
+const handleAvatarUploadSuccess = (response) => {
+  formData.value.avatar = response.data.url;
+  ElMessage.success('头像上传成功');
+};
+
+// 头像上传前验证
+const beforeAvatarUpload = (file) => {
+  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+  if (!isJpgOrPng) {
+    ElMessage.error('只能上传 JPG/PNG 格式的图片');
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB');
+  }
+  return isJpgOrPng && isLt2M;
+};
+
+// 打开系统头像选择器
+const openSystemAvatarSelector = () => {
+  // 这里需要实现系统头像选择器的逻辑
+  ElMessage.warning('系统头像选择器功能待实现');
+};
+
+// 提交表单
+const submitForm = () => {
+  formRef.value.validate((valid) => {
+    if (valid) {
+      // 处理与后端API的交互逻辑
+      ElMessage.success('表单提交成功');
+    } else {
+      ElMessage.error('表单验证失败，请检查输入');
+    }
+  });
+};
+
+// 重置表单
+const resetForm = () => {
+  formRef.value.resetFields();
+  formData.value.avatar = '';
+  privacySettings.value = {
+    profileVisibility: 'everyone',
+    collectionVisibility: 'everyone',
+    commentVisibility: 'everyone',
+    activeStatus: true
+  };
+};
 </script>
 
 <template>
   <div class="user-profile-settings-container">
     <el-card>
-      <div class="settings-header">
-        <h1 class="text-2xl font-bold mb-4">账户设置</h1>
-        <p class="text-gray-500 mb-6">自定义您的个人信息和隐私设置</p>
-      </div>
+      <template #header>
+        <div class="settings-header">
+          <h1 class="text-2xl font-bold mb-4">账户设置</h1>
+          <p class="text-gray-500 mb-6">自定义您的个人信息和隐私设置</p>
+        </div>
+      </template>
     </el-card>
-
 
     <div class="settings-content grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- 左侧：个人信息表单 -->
@@ -26,147 +102,84 @@
         <h2 class="text-xl font-semibold mb-4">个人信息</h2>
 
         <!-- 头像设置区域 -->
-        <div class="mb-6">
-          <label class="block text-gray-700 font-medium mb-2">头像</label>
-          <div class="flex items-center">
-            <!-- 这里需要补充：头像预览区域，显示当前选择的头像 -->
-            <div class="w-20 h-20 rounded-full bg-gray-200 overflow-hidden mr-4">
-              <!-- 头像图片将显示在这里 -->
-              <img src="https://picsum.photos/200/200" alt="用户头像" class="w-full h-full object-cover">
+        <el-form-item label="头像">
+          <template #content>
+            <div class="flex items-center">
+              <div class="w-20 h-20 rounded-full bg-gray-200 overflow-hidden mr-4">
+                <img :src="formData.avatar || 'https://picsum.photos/200/200'" alt="用户头像" class="w-full h-full object-cover">
+              </div>
+              <div>
+                <el-upload
+                    :action="uploadUrl"
+                    :show-file-list="false"
+                    @success="handleAvatarUploadSuccess"
+                    :before-upload="beforeAvatarUpload"
+                >
+                  <el-button type="primary">上传新头像</el-button>
+                </el-upload>
+                <el-button type="text" @click="openSystemAvatarSelector">选择系统头像</el-button>
+              </div>
             </div>
-
-            <div>
-              <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md mb-2">
-                上传新头像
-                <!-- 这里需要补充：调用本地相册上传的功能 -->
-              </button>
-              <button class="text-blue-500 hover:text-blue-700">
-                选择系统头像
-                <!-- 这里需要补充：打开系统头像模板选择器的功能 -->
-              </button>
-            </div>
-          </div>
-        </div>
+          </template>
+        </el-form-item>
 
         <!-- 个人信息表单 -->
-        <div class="space-y-4">
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">昵称</label>
-            <input type="text" placeholder="请输入您的昵称" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <!-- 这里可能需要补充：昵称验证逻辑和错误提示 -->
-          </div>
-
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">签名</label>
-            <textarea placeholder="介绍一下您自己..." rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
-            <!-- 这里需要补充：签名长度限制和错误提示 -->
-          </div>
-
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">性别</label>
-            <div class="flex space-x-4">
-              <label class="inline-flex items-center">
-                <input type="radio" name="gender" value="male" class="form-radio h-4 w-4 text-blue-500">
-                <span class="ml-2">男</span>
-              </label>
-              <label class="inline-flex items-center">
-                <input type="radio" name="gender" value="female" class="form-radio h-4 w-4 text-blue-500">
-                <span class="ml-2">女</span>
-              </label>
-              <label class="inline-flex items-center">
-                <input type="radio" name="gender" value="other" class="form-radio h-4 w-4 text-blue-500">
-                <span class="ml-2">保密</span>
-              </label>
-            </div>
-            <!-- 这里需要补充：性别选择的状态管理 -->
-          </div>
-
-          <div>
-            <label class="block text-gray-700 font-medium mb-1">生日</label>
-            <input type="date" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <!-- 这里需要补充：生日格式验证和年龄计算 -->
-          </div>
-        </div>
+        <el-form :model="formData" :rules="rules" ref="formRef">
+          <el-form-item label="昵称" prop="nickname">
+            <el-input v-model="formData.nickname" placeholder="请输入您的昵称"></el-input>
+          </el-form-item>
+          <el-form-item label="签名" prop="signature">
+            <el-input type="textarea" v-model="formData.signature" placeholder="介绍一下您自己..." rows="3"></el-input>
+          </el-form-item>
+          <el-form-item label="性别" prop="gender">
+            <el-radio-group v-model="formData.gender">
+              <el-radio label="male">男</el-radio>
+              <el-radio label="female">女</el-radio>
+              <el-radio label="other">保密</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="生日" prop="birthday">
+            <el-date-picker v-model="formData.birthday" type="date" placeholder="选择日期"></el-date-picker>
+          </el-form-item>
+        </el-form>
       </div>
 
       <!-- 右侧：隐私设置 -->
       <div class="bg-white rounded-xl shadow-md p-6">
         <h2 class="text-xl font-semibold mb-4">隐私设置</h2>
-
-        <div class="space-y-4">
-          <!-- 隐私选项列表 -->
-          <div class="p-3 bg-gray-50 rounded-lg">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="font-medium">个人资料</h3>
-                <p class="text-sm text-gray-500">控制您的基本信息可见性</p>
-              </div>
-              <select class="border border-gray-300 rounded-md px-2 py-1 bg-white">
-                <option>所有人可见</option>
-                <option>仅关注者可见</option>
-                <option>仅自己可见</option>
-              </select>
-              <!-- 这里需要补充：个人资料隐私设置的状态管理 -->
-            </div>
-          </div>
-
-          <div class="p-3 bg-gray-50 rounded-lg">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="font-medium">收藏记录</h3>
-                <p class="text-sm text-gray-500">控制您的收藏内容可见性</p>
-              </div>
-              <select class="border border-gray-300 rounded-md px-2 py-1 bg-white">
-                <option>所有人可见</option>
-                <option>仅关注者可见</option>
-                <option>仅自己可见</option>
-              </select>
-              <!-- 这里需要补充：收藏记录隐私设置的状态管理 -->
-            </div>
-          </div>
-
-          <div class="p-3 bg-gray-50 rounded-lg">
-            <div class="flex justify-between items-center">
-              <div>
-                <h3 class="font-medium">评论内容</h3>
-                <p class="text-sm text-gray-500">控制您的评论可见性</p>
-              </div>
-              <select class="border border-gray-300 rounded-md px-2 py-1 bg-white">
-                <option>所有人可见</option>
-                <option>仅关注者可见</option>
-                <option>仅自己可见</option>
-              </select>
-              <!-- 这里需要补充：评论内容隐私设置的状态管理 -->
-            </div>
-          </div>
-
-          <div class="p-3 bg-gray-50 rounded-lg">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="font-medium">活跃状态</h3>
-                <p class="text-sm text-gray-500">显示您的在线/离线状态</p>
-              </div>
-              <label class="inline-flex items-center">
-                <input type="checkbox" class="form-checkbox h-5 w-5 text-blue-500 rounded">
-                <span class="ml-2">开启</span>
-              </label>
-              <!-- 这里需要补充：活跃状态设置的状态管理 -->
-            </div>
-          </div>
-        </div>
+        <el-form :model="privacySettings">
+          <el-form-item label="个人资料">
+            <el-select v-model="privacySettings.profileVisibility">
+              <el-option label="所有人可见" value="everyone"></el-option>
+              <el-option label="仅关注者可见" value="followers"></el-option>
+              <el-option label="仅自己可见" value="onlyMe"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="收藏记录">
+            <el-select v-model="privacySettings.collectionVisibility">
+              <el-option label="所有人可见" value="everyone"></el-option>
+              <el-option label="仅关注者可见" value="followers"></el-option>
+              <el-option label="仅自己可见" value="onlyMe"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="评论内容">
+            <el-select v-model="privacySettings.commentVisibility">
+              <el-option label="所有人可见" value="everyone"></el-option>
+              <el-option label="仅关注者可见" value="followers"></el-option>
+              <el-option label="仅自己可见" value="onlyMe"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="活跃状态">
+            <el-switch v-model="privacySettings.activeStatus"></el-switch>
+          </el-form-item>
+        </el-form>
       </div>
     </div>
 
     <!-- 底部：操作按钮 -->
     <div class="mt-6 flex justify-end space-x-4">
-      <button class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50">
-        取消
-        <!-- 这里需要补充：重置表单的功能 -->
-      </button>
-      <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-        保存更改
-        <!-- 这里需要补充：提交表单到后端的功能 -->
-      </button>
+      <el-button @click="resetForm">取消</el-button>
+      <el-button type="primary" @click="submitForm">保存更改</el-button>
     </div>
   </div>
 </template>
@@ -188,10 +201,6 @@
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       }
     }
-  }
-
-  .form-radio:focus, .form-checkbox:focus {
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
   }
 
   button {
