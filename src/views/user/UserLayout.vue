@@ -90,26 +90,12 @@ const handleCommand = (command) => {
           </el-icon>
           <span>用户评论</span>
         </el-menu-item>
-        <el-sub-menu index="/user/UserPersonalize">
-          <template #title>
-            <el-icon>
-              <UserFilled/>
-            </el-icon>
-            <span>个性化设置</span>
-          </template>
-          <el-menu-item index="/user/UserSetting">
-            <el-icon>
-              <User/>
-            </el-icon>
-            <span>账户信息</span>
-          </el-menu-item>
-          <el-menu-item index="/user/UserPrivacy">
-            <el-icon>
-              <EditPen/>
-            </el-icon>
-            <span>隐私设置</span>
-          </el-menu-item>
-        </el-sub-menu>
+        <el-menu-item index="/user/UserSetting">
+          <el-icon>
+            <User />
+          </el-icon>
+          <span>用户设置</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <!-- 右侧主区域 -->
@@ -119,7 +105,7 @@ const handleCommand = (command) => {
         <div>欢迎：<strong>{{ userInfoStore.userInfo.loginName }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
-                        <el-avatar :src="userInfoStore.userInfo.avater?userInfoStore.userInfo.avater:avatar"/>
+                        <el-avatar :src="userInfoStore.userInfo.avatar?userInfoStore.userInfo.avater:avatar"/>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>

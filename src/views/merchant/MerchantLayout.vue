@@ -72,32 +72,30 @@ const handleCommand = (command) => {
           </el-icon>
           <span>商家主页</span>
         </el-menu-item>
-        <el-menu-item index="/user/MerchantSetting">
+        <el-menu-item index="/user/MerchantRegister">
           <el-icon>
             <EditPen/>
           </el-icon>
-          <span>商家设置</span>
+          <span>商家注册</span>
         </el-menu-item>
-        <el-menu-item index="/user/MerchantRegister">
+        <el-menu-item index="/user/FansInteract">
           <el-icon>
             <User />
           </el-icon>
-          <span>商家注册</span>
+          <span>粉丝互动</span>
         </el-menu-item>
-        <el-sub-menu index="FansInteract">
-          <template #title>
-            <el-icon>
-              <UserFilled/>
-            </el-icon>
-            <span>粉丝互动</span>
-          </template>
-          <el-menu-item index="/user/MerchantComment">
-            <el-icon>
-              <User/>
-            </el-icon>
-            <span>商家评论</span>
-          </el-menu-item>
-        </el-sub-menu>
+        <el-menu-item index="/user/MerchantComment">
+          <el-icon>
+            <User />
+          </el-icon>
+          <span>评论查看</span>
+        </el-menu-item>
+        <el-menu-item index="/user/MerchantSetting">
+          <el-icon>
+            <User />
+          </el-icon>
+          <span>商家设置</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
     <!-- 右侧主区域 -->
