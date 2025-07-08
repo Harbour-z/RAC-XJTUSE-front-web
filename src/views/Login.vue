@@ -23,32 +23,6 @@ const registerForm = ref({
   email: ''
 })
 
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
-
-const validatePassword = (rule, value, callback) => {
-  if (value !== registerForm.value.password) {
-    callback(new Error('两次输入的密码不一致'));
-  } else {
-    callback();
-  }
-};
-
-const rules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' },
-    { min: 4, max: 16, message: '长度在4到16个字符', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在6到20个字符', trigger: 'blur' }
-  ],
-  confirmPassword: [
-    { required: true, message: '请确认密码', trigger: 'blur' },
-    { validator: validatePassword, trigger: 'blur' }
-  ]
-}
-
 const handleLogin = async (e) => {
   e.preventDefault()
 
@@ -132,10 +106,16 @@ const handleRegister = async (e) => {
       res = await merchantRegister(registerData);
     }
 
-    if (res.success) {
+    if (res.data) {
       ElMessage.success('注册成功');
       // 自动切换到登录界面
       container.classList.remove("sign-up-mode");
+
+      // 自动填充登录表单
+      loginForm.value.account = registerForm.value.username;
+      loginForm.value.password = registerForm.value.password;
+      loginForm.value.role = registerForm.value.role === 'user' ? '用户' : '商家';
+
       // 清空注册表单
       registerForm.value = {
         role: 'user',
@@ -146,7 +126,7 @@ const handleRegister = async (e) => {
         email: ''
       };
     } else {
-      ElMessage.error(res.message || '注册失败');
+      ElMessage.error('注册失败');
     }
   } catch (error) {
     ElMessage.error(`注册失败: ${error.message}`);
