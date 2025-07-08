@@ -18,6 +18,7 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
+        // target:'http://127.0.0.1:4523/m1/6727751-0-default',//测试apifox用地址
         changeOrigin: true,
         rewrite: path => path.replace(/^\/api/,'/api')
       },
