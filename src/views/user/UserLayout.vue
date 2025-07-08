@@ -101,7 +101,7 @@ const handleCommand = (command) => {
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>欢迎：<strong>{{ userInfoStore.userInfo.loginName }}</strong></div>
+        <div>欢迎：<strong>{{ userInfoStore.userInfo.username }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="userInfoStore.userInfo.avatar?userInfoStore.userInfo.avater:avatar"/>

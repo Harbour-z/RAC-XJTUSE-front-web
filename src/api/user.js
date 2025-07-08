@@ -1,13 +1,10 @@
 import request from "@/utils/request";
 
-//可能是Session自带，可以试着套用
-export const userInfoService = () => request.get('/api/auth/userInfo')
-
 // 获取当前用户信息
-export const getCurUser = () => request.get('/api/user/getInfo')
+export const getCurUser = () => request.get('/api/userInfo/getInfo')
 
 // 更新当前用户信息(可用于Edit)
-export const updateUser = (user) => request.post('/api/user/updateUser', user)
+export const updateUser = (user) => request.post('/api/userInfo/updateUser', user)
 
 // 注销账户 DELETE /api/users/me
 
