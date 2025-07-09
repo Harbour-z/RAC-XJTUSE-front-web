@@ -26,6 +26,11 @@ const userList = ref([]);
 const formatStatus = (status: number) => {
   return status === 0 ? '正常' : '冻结';
 };
+const formatGender = (userGender: number) => {
+  if (userGender == 1) return '男'
+  else if(userGender == 2) return '女'
+  else return '未知';
+};
 const getUsers = () => {
   const query = {
     pageNum: pageNum.value,
@@ -44,14 +49,12 @@ const getUsers = () => {
 const editDialogVisible = ref(false);
 const recordDialogVisible = ref(false);
 const editUserData = ref({
-  loginName: '',
-  nickname: '',
-  avatar: '',
+  id:0,
+  username: '',
+  phone: '',
+  email: '',
 });
 const recordDetails = ref('');
-
-// 默认头像
-const defaultAvatar = ref('https://via.placeholder.com/50');
 
 // 删除用户
 const removeUser = (row) => {
@@ -91,11 +94,45 @@ const removeUser = (row) => {
 }
 
 // 编辑用户
-const editUser = (user) => {
-  editUserData.value = { ...user };
+const editUser = (row) => {
+  editUserData.value = JSON.parse(JSON.stringify(row))
   editDialogVisible.value = true;
 };
+// 保存编辑
+const saveEdit = () => {
+  const user = {
+    id: editUserData.value.id,
+    username: editUserData.value.username,
+    phone: editUserData.value.phone,
+    email: editUserData.value.email,
+  };
 
+  updateUser(user)
+      .then(res => {
+        console.info(res.code)
+        if (res.status) { // 根据你的后端实际返回结构调整
+          ElMessage({
+            message: "编辑成功",
+            type: "success",
+          });
+          getUsers(); // 刷新用户列表
+        } else {
+          ElMessage({
+            message: res.message,
+            type: "warning",
+          });
+        }
+      })
+      .catch(error => {
+        ElMessage({
+          message: error.message || "请求失败，请稍后重试",
+          type: "error",
+        });
+      })
+      .finally(() => {
+        editDialogVisible.value = false;
+      });
+};
 // 切换用户状态（冻结/解冻）
 const toggleUserStatus = (row) => {
   const newStatus = row.status === 0 ? 1 : 0;
@@ -129,23 +166,6 @@ const viewFavoriteRecords = (user) => {
   recordDialogVisible.value = true;
 };
 
-// 取消编辑
-const cancelEdit = () => {
-  editDialogVisible.value = false;
-};
-
-// 保存编辑
-const saveEdit = () => {
-  // 这里应该调用后端接口保存编辑信息
-  console.log('Save edit:', editUserData.value);
-  editDialogVisible.value = false;
-};
-
-// 处理头像上传成功
-const handleAvatarUploadSuccess = (response, file, fileList) => {
-  editUserData.value.avatar = response.url; // 假设返回的是图片的URL
-};
-
 getUsers()
 </script>
 
@@ -172,11 +192,15 @@ getUsers()
     </el-form>
 
     <el-table :data="userList" style="width: 100%">
-      <el-table-column prop="username" label="用户名" />
-      <el-table-column prop="userGender" label="性别" />
+      <el-table-column fixed prop="username" label="用户名" width="150%" />
+      <el-table-column label="性别" >
+        <template #default="scope">
+          {{ formatGender(scope.row.userGender) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="birthday" label="生日" />
       <el-table-column prop="phone" label="电话" />
-      <el-table-column prop="email" label="邮箱" />
+      <el-table-column prop="email" label="邮箱" width="200%" />
       <el-table-column prop="signature" label="个性签名" />
       <el-table-column label="账号状态">
         <template #default="scope">
@@ -184,12 +208,11 @@ getUsers()
         </template>
       </el-table-column>
       <el-table-column prop="createTime" label="注册时间" />
-      <el-table-column prop="updateTime" label="账号状态" />
-<!--      <el-table-column prop="avatar" label="头像">-->
-<!--        <template #default="scope">-->
-<!--          <img height="50" :src="scope.row.avatar || defaultAvatar" alt="Avatar" />-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <el-table-column prop="avatar" label="头像">
+        <template #default="scope">
+          <img height="50" :src="scope.row.userAvatar" alt="Avatar" />
+        </template>
+      </el-table-column>
 <!--      <el-table-column label="登录记录">-->
 <!--        <template #default="scope">-->
 <!--          <el-button type="text" @click="viewLoginRecords(scope.row)">查看</el-button>-->
@@ -224,33 +247,25 @@ getUsers()
   </el-card>
   <el-dialog
       title="用户信息编辑"
-      :visible.sync="editDialogVisible"
+      v-model="editDialogVisible"
       width="500"
   >
     <span>
       <el-form label-width="auto" style="max-width: 600px">
         <el-form-item label="用户名">
-          <el-input v-model="editUserData.loginName" disabled />
+          <el-input v-model="editUserData.username" />
         </el-form-item>
-        <el-form-item label="昵称">
-          <el-input v-model="editUserData.nickname" />
+        <el-form-item label="电话">
+          <el-input v-model="editUserData.phone" />
         </el-form-item>
-        <el-form-item label="头像">
-          <el-upload
-              class="avatar-uploader"
-              action="/api/file/upload"
-              :show-file-list="false"
-              :on-success="handleAvatarUploadSuccess"
-          >
-            <img v-if="editUserData.avatar" :src="editUserData.avatar" class="avatar" />
-            <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-          </el-upload>
+        <el-form-item label="邮箱">
+          <el-input v-model="editUserData.email" />
         </el-form-item>
       </el-form>
     </span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="cancelEdit">取消</el-button>
+        <el-button @click="editDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="saveEdit">确认</el-button>
       </div>
     </template>
