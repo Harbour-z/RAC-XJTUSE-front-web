@@ -4,7 +4,7 @@ import request from "@/utils/request";
 export const getCurUser = () => request.get('/api/userInfo/getInfo')
 
 // 更新当前用户信息(可用于Edit)
-export const updateUser = (user) => request.post('/api/userInfo/updateUser', user)
+export const updateUser = (user) => request.patch('/api/userInfo/updateUser', user)
 
 export const pageUsers = (query) => request.get('/api/userInfo/listPage',{params:query})
 // 注销账户 DELETE /api/users/me

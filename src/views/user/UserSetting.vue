@@ -8,6 +8,7 @@ import {Plus} from "@element-plus/icons-vue";
 const userInfoStore = useUserInfoStore();
 const router = useRouter();
 import {updateUser} from "@/api/user"
+import avatar from '@/assets/default.png'
 
 const imageUrl = ref('')
 
@@ -29,17 +30,17 @@ getUserInfo();
 // 表单数据模型
 const formData = ref({
   id:userInfoStore.userInfo.id,
-  avatar: userInfoStore.userInfo.userAvatar,
+  userAvatar: userInfoStore.userInfo.userAvatar,
   username: userInfoStore.userInfo.username,
   signature: userInfoStore.userInfo.signature,
-  gender: userInfoStore.userInfo.userGender,
+  userGender: userInfoStore.userInfo.userGender,
   birthday: userInfoStore.userInfo.birthday,
 });
 
 // 隐私设置状态
 const privacySettings = ref({
-  profileVisibility: userInfoStore.userInfo.profileVisibile,
-  collectionVisibility: userInfoStore.userInfo.favoriteVisibile,
+  profileVisible: userInfoStore.userInfo.profileVisibile,
+  favoriteVisible: userInfoStore.userInfo.favoriteVisibile,
 });
 
 // 表单验证规则
@@ -58,7 +59,7 @@ const formRef = ref(null);
 // 头像上传成功处理
 const handleAvatarSuccess = (response, uploadFile) => {
   imageUrl.value = URL.createObjectURL(uploadFile.raw)
-  formData.value.avatar = URL.createObjectURL(response.avatar);
+  formData.value.userAvatar = response.data.url;
 }
 
 
@@ -86,10 +87,10 @@ const submitForm = () => {
 // 重置表单
 const resetForm = () => {
   formRef.value.resetFields();
-  formData.value.avatar = '';
+  formData.value.userAvatar = '';
   privacySettings.value = {
-    profileVisibility: 0,
-    collectionVisibility: 0,
+    profileVisible: 0,
+    favoriteVisible: 0,
   };
 };
 </script>
@@ -112,11 +113,8 @@ const resetForm = () => {
 
         <div>
           头像展示
-          <img
-              v-if="userInfoStore.userInfo.userAvatar"
-              :src="userInfoStore.userInfo.userAvatar"
+          <img :src="userInfoStore.userInfo.userAvatar?userInfoStore.userInfo.userAvatar:avatar"
               alt=""  width="100" height="100"/>
-          <div v-else>暂无头像</div>
         </div>
 
         <div>
@@ -144,7 +142,7 @@ const resetForm = () => {
             <el-input type="textarea" v-model="formData.signature" placeholder="介绍一下您自己..." rows="2"></el-input>
           </el-form-item>
           <el-form-item label="性别" prop="gender">
-            <el-radio-group v-model="formData.gender">
+            <el-radio-group v-model="formData.userGender">
               <el-radio :label= 0>男</el-radio>
               <el-radio :label= 1>女</el-radio>
             </el-radio-group>
@@ -160,13 +158,13 @@ const resetForm = () => {
         <h2 class="text-xl font-semibold mb-4">隐私设置</h2>
         <el-form :model="privacySettings">
           <el-form-item label="个人资料">
-            <el-select v-model="privacySettings.profileVisibility">
+            <el-select v-model="privacySettings.profileVisible">
               <el-option label="所有人可见" :value= 0></el-option>
               <el-option label="仅自己可见" :value= 1></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="收藏记录">
-            <el-select v-model="privacySettings.collectionVisibility">
+            <el-select v-model="privacySettings.favoriteVisible">
               <el-option label="所有人可见" :value= 0></el-option>
               <el-option label="仅自己可见" :value= 1></el-option>
             </el-select>
