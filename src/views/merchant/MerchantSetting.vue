@@ -155,7 +155,7 @@ const submitForm = () => {
             <el-form-item label="商家头像">
               <div class="flex flex-col items-center">
                 <img
-                    :src="merchantInfo.avatar || 'https://picsum.photos/200/200'"
+                    :src="merchantInfo.avatar || 'https://picsum.photos/100/100'"
                     alt="商家头像"
                     class="w-32 h-32 rounded-lg bg-gray-200 overflow-hidden mb-3"
                 />

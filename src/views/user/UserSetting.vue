@@ -8,6 +8,7 @@ import {Plus} from "@element-plus/icons-vue";
 const userInfoStore = useUserInfoStore();
 const router = useRouter();
 import {updateUser} from "@/api/user"
+import avatar from '@/assets/default.png'
 
 const imageUrl = ref('')
 
@@ -112,11 +113,8 @@ const resetForm = () => {
 
         <div>
           头像展示
-          <img
-              v-if="userInfoStore.userInfo.userAvatar"
-              :src="userInfoStore.userInfo.userAvatar"
+          <img :src="userInfoStore.userInfo.userAvatar?userInfoStore.userInfo.userAvatar:avatar"
               alt=""  width="100" height="100"/>
-          <div v-else>暂无头像</div>
         </div>
 
         <div>
