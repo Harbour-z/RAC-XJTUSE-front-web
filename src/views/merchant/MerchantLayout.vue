@@ -99,7 +99,7 @@ const handleCommand = (command) => {
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>欢迎：<strong>{{ merchantInfoStore.merchantInfo }}</strong></div>
+        <div>欢迎：<strong>{{ merchantInfoStore.merchantInfo.username }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
                         <el-avatar :src="merchantInfoStore.merchantInfo.avatar?merchantInfoStore.merchantInfo.avater:avatar"/>

@@ -11,27 +11,26 @@ import {
   User,
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
-import {useUserInfoStore} from "@/stores/userInfo";
 import {useRouter} from "vue-router";
 import {ElMessage, ElMessageBox} from "element-plus";
-import {getCurUser} from "@/api/user";
-const userInfoStore = useUserInfoStore();
 
-//getCurUser
-const getUserInfo = ()=>{
-  getCurUser().then(res => {
-    if(!res.data){
-      ElMessage({
-        message:'未登入',
-        type:'warning'
-      })
-      router.push({path:'/login'})
-    }else{
-      userInfoStore.setUserInfo(res.data)
+//欢迎后的id实现
+import {useAdminInfoStore} from "@/stores/adminInfo";
+import {getCurAdminInfo} from "@/api/admin";
+const adminInfoStore = useAdminInfoStore();
+getCurAdminInfo().then(
+    res => {
+      if(!res.data){
+        ElMessage({
+          message:'未登入',
+          type:'warning'
+        })
+        router.push({path:'/login'})
+      }else{
+        adminInfoStore.setAdminInfo(res.data)
+      }
     }
-  })
-}
-getUserInfo()
+)
 
 const router = useRouter();
 const handleCommand = (command) => {
@@ -47,7 +46,7 @@ const handleCommand = (command) => {
     ).then(
         async () => {
           // clear data in pinia
-          userInfoStore.removeUserInfo()
+          adminInfoStore.removeAdminInfo()
           ElMessage.success("退出成功")
           await router.push('/login')
         }
@@ -89,10 +88,10 @@ const handleCommand = (command) => {
     <el-container>
       <!-- 头部区域 -->
       <el-header>
-        <div>欢迎：<strong>{{ userInfoStore.userInfo.loginName }}</strong></div>
+        <div>欢迎：<strong>{{ adminInfoStore.adminInfo.username }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
-                        <el-avatar :src="userInfoStore.userInfo.avatar?userInfoStore.userInfo.avater:avatar"/>
+                        <el-avatar :src="adminInfoStore.adminInfo.avatar?adminInfoStore.adminInfo.avater:avatar"/>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>
