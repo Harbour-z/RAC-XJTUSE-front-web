@@ -1,14 +1,11 @@
 import request from "@/utils/request";
 // 获取指定用户信息（管理员权限） GET    /api/users/{id}
 
-//getpage
-export const pageUsers = (query) => request.get('/api/user/listPage',{params:query})
-
 //获取当前管理员信息
 export const getCurAdminInfo = (user) => request.get('/api/adminInfo/getInfoMy',{params:user})
 
 //id remove url?id=x 删除指定用户信息（管理员权限）
-export const removeById = (user) => request.get('/api/user/removeUser',{params:user})
+export const deleteUser = (user) => request.get('/api/userInfo/removeUser',{params:user})
 
 // 待审核商家列表 GET    /api/admin/merchants/pending
 

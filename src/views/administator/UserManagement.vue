@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {h, ref} from 'vue';
+import {deleteUser} from '../../api/admin'
 import {pageUsers} from '../../api/user'
+import {ElMessage, ElMessageBox} from "element-plus";
 
 // 搜索相关
 const searchUsername = ref('');
@@ -39,17 +41,42 @@ const recordDetails = ref('');
 // 默认头像
 const defaultAvatar = ref('https://via.placeholder.com/50');
 
-// 查询用户
-const searchUsers = () => {
-  // 这里应该调用后端接口进行查询
-  console.log('Search users:', searchUsername.value, searchStatus.value);
-};
-
 // 删除用户
-const deleteUser = (user) => {
-  // 这里应该调用后端接口进行删除
-  console.log('Delete user:', user);
-};
+const removeUser = (row) => {
+  ElMessageBox({
+    title: '确认删除',
+    message: h('p', null, [
+      h('span', null, '确定要删除用户'+row.username+'吗？ '),
+      h('i', { style: 'color: teal' }, '(此操作不可逆)'),
+    ]),
+    showCancelButton: true,
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning',
+    beforeClose: async (action, instance, done) => {
+      if (action === 'confirm') {
+        instance.confirmButtonLoading = true
+        instance.confirmButtonText = '删除中...'
+        try {
+          const query = {
+            id:row.id
+          }
+          await deleteUser(query)
+          done()
+          ElMessage.success('删除成功')
+          getUsers()
+        } catch (error) {
+          ElMessage.error('删除失败')
+          done()
+        } finally {
+          instance.confirmButtonLoading = false
+        }
+      } else {
+        done()
+      }
+    }
+  })
+}
 
 // 编辑用户
 const editUser = (user) => {
@@ -97,13 +124,13 @@ const handleAvatarUploadSuccess = (response, file, fileList) => {
 // 处理分页大小改变
 const handleSizeChange = (newSize) => {
   pageSize.value = newSize;
-  searchUsers();
+  getUsers();
 };
 
 // 处理当前页码改变
 const handleCurrentChange = (newPage) => {
   pageNum.value = newPage;
-  searchUsers();
+  getUsers();
 };
 
 getUsers()
@@ -163,7 +190,7 @@ getUsers()
 
       <el-table-column fixed="right" label="操作" width="300">
         <template #default="scope">
-          <el-button type="danger" @click="deleteUser(scope.row)">删除</el-button>
+          <el-button type="danger" @click="removeUser(scope.row)">删除</el-button>
           <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>
           <el-button type="warning" @click="toggleUserStatus(scope.row)">
             {{ scope.row.status == 0 ? '冻结' : '解冻' }}
