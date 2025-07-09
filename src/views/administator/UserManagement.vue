@@ -9,6 +9,10 @@ const pageNum = ref(1);
 const pageSize = ref(10);
 // 表格数据
 const userList = ref([]);
+// 计算属性：格式化状态显示
+const formatStatus = (status: number) => {
+  return status === 0 ? '正常' : '冻结';
+};
 const getUsers = () => {
   const query = {
     pageNum: pageNum.value,
@@ -19,7 +23,6 @@ const getUsers = () => {
 
   pageUsers(query).then(res => {
     userList.value = res.data.records
-    console.info(userList.value)
   })
 }
 
@@ -135,7 +138,11 @@ getUsers()
       <el-table-column prop="phone" label="电话" />
       <el-table-column prop="email" label="邮箱" />
       <el-table-column prop="signature" label="个性签名" />
-      <el-table-column prop="status" label="账号状态" />
+      <el-table-column label="账号状态">
+        <template #default="scope">
+          {{ formatStatus(scope.row.status) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="createTime" label="注册时间" />
       <el-table-column prop="updateTime" label="账号状态" />
 <!--      <el-table-column prop="avatar" label="头像">-->
@@ -154,15 +161,15 @@ getUsers()
 <!--        </template>-->
 <!--      </el-table-column>-->
 
-<!--      <el-table-column fixed="right" label="操作">-->
-<!--        <template #default="scope">-->
-<!--          <el-button type="danger" @click="deleteUser(scope.row)">删除</el-button>-->
-<!--          <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>-->
-<!--          <el-button type="warning" @click="toggleUserStatus(scope.row)">-->
-<!--            {{ scope.row.status === 'normal' ? '冻结' : '解冻' }}-->
-<!--          </el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
+      <el-table-column fixed="right" label="操作" width="300">
+        <template #default="scope">
+          <el-button type="danger" @click="deleteUser(scope.row)">删除</el-button>
+          <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>
+          <el-button type="warning" @click="toggleUserStatus(scope.row)">
+            {{ scope.row.status == 0 ? '冻结' : '解冻' }}
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
         :page-sizes="[5, 10, 20, 30, 40]"
