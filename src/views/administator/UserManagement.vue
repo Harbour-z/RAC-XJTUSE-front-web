@@ -1,14 +1,27 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
+import {pageUsers} from '../../api/user'
 
 // 搜索相关
 const searchUsername = ref('');
-const searchStatus = ref('');
-const currentPage = ref(1);
+const searchStatus = ref(0);
+const pageNum = ref(1);
 const pageSize = ref(10);
-
 // 表格数据
 const userList = ref([]);
+const getUsers = () => {
+  const query = {
+    pageNum: pageNum.value,
+    pageSize: pageSize.value,
+    username: searchUsername.value,
+    status: searchStatus.value
+  }
+
+  pageUsers(query).then(res => {
+    userList.value = res.data.records
+    console.info(userList.value)
+  })
+}
 
 // 对话框相关
 const editDialogVisible = ref(false);
@@ -54,13 +67,6 @@ const viewLoginRecords = (user) => {
   recordDialogVisible.value = true;
 };
 
-// 查看消费记录
-const viewConsumptionRecords = (user) => {
-  // 这里应该调用后端接口获取消费记录
-  recordDetails.value = '模拟消费记录...';
-  recordDialogVisible.value = true;
-};
-
 // 查看收藏记录
 const viewFavoriteRecords = (user) => {
   // 这里应该调用后端接口获取收藏记录
@@ -93,9 +99,11 @@ const handleSizeChange = (newSize) => {
 
 // 处理当前页码改变
 const handleCurrentChange = (newPage) => {
-  currentPage.value = newPage;
+  pageNum.value = newPage;
   searchUsers();
 };
+
+getUsers()
 </script>
 
 <template>
@@ -110,54 +118,57 @@ const handleCurrentChange = (newPage) => {
         <el-input placeholder="用户名" clearable v-model="searchUsername" />
       </el-form-item>
       <el-form-item label="账号状态">
-        <el-select v-model="searchStatus" placeholder="请选择账号状态">
-          <el-option label="正常" value="normal" />
-          <el-option label="冻结" value="frozen" />
+        <el-select v-model="searchStatus" placeholder="请选择账号状态" style="width:150px">
+          <el-option label="正常" :value="0" />
+          <el-option label="冻结" :value="1" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="searchUsers">查询</el-button>
+        <el-button type="primary" @click="getUsers">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table height="500" style="width: 100%">
-      <el-table-column prop="loginName" label="用户名" />
-      <el-table-column prop="avatar" label="头像">
-        <template #default="scope">
-          <img height="50" :src="scope.row.avatar || defaultAvatar" alt="Avatar" />
-        </template>
-      </el-table-column>
-      <el-table-column label="注册时间" prop="registrationTime" />
-      <el-table-column label="登录记录">
-        <template #default="scope">
-          <el-button type="text" @click="viewLoginRecords(scope.row)">查看</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="消费记录">
-        <template #default="scope">
-          <el-button type="text" @click="viewConsumptionRecords(scope.row)">查看</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="收藏记录">
-        <template #default="scope">
-          <el-button type="text" @click="viewFavoriteRecords(scope.row)">查看</el-button>
-        </template>
-      </el-table-column>
+
+    <el-table :data="userList" height="500" style="width: 100%">
+      <el-table-column prop="username" label="用户名" />
+      <el-table-column prop="userGender" label="性别" />
+      <el-table-column prop="birthday" label="生日" />
+      <el-table-column prop="phone" label="电话" />
+      <el-table-column prop="email" label="邮箱" />
+      <el-table-column prop="signature" label="个性签名" />
       <el-table-column prop="status" label="账号状态" />
-      <el-table-column label="操作">
-        <template #default="scope">
-          <el-button type="danger" @click="deleteUser(scope.row)">删除</el-button>
-          <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>
-          <el-button type="warning" @click="toggleUserStatus(scope.row)">
-            {{ scope.row.status === 'normal' ? '冻结' : '解冻' }}
-          </el-button>
-        </template>
-      </el-table-column>
+      <el-table-column prop="createTime" label="注册时间" />
+      <el-table-column prop="updateTime" label="账号状态" />
+<!--      <el-table-column prop="avatar" label="头像">-->
+<!--        <template #default="scope">-->
+<!--          <img height="50" :src="scope.row.avatar || defaultAvatar" alt="Avatar" />-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column label="登录记录">-->
+<!--        <template #default="scope">-->
+<!--          <el-button type="text" @click="viewLoginRecords(scope.row)">查看</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+<!--      <el-table-column label="收藏记录">-->
+<!--        <template #default="scope">-->
+<!--          <el-button type="text" @click="viewFavoriteRecords(scope.row)">查看</el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
+
+<!--      <el-table-column fixed="right" label="操作">-->
+<!--        <template #default="scope">-->
+<!--          <el-button type="danger" @click="deleteUser(scope.row)">删除</el-button>-->
+<!--          <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>-->
+<!--          <el-button type="warning" @click="toggleUserStatus(scope.row)">-->
+<!--            {{ scope.row.status === 'normal' ? '冻结' : '解冻' }}-->
+<!--          </el-button>-->
+<!--        </template>-->
+<!--      </el-table-column>-->
     </el-table>
     <el-pagination
         :page-sizes="[5, 10, 20, 30, 40]"
         :background="true"
         layout="total, sizes, prev, pager, next, jumper"
-        :current-page="currentPage"
+        :current-page="pageNum"
         :page-size="pageSize"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"

@@ -104,7 +104,7 @@ const handleCommand = (command) => {
         <div>欢迎：<strong>{{ userInfoStore.userInfo.username }}</strong></div>
         <el-dropdown placement="bottom-end" @command="handleCommand">
                     <span class="el-dropdown__box">
-                        <el-avatar :src="userInfoStore.userInfo.avatar?userInfoStore.userInfo.avater:avatar"/>
+                        <el-avatar :src="userInfoStore.userInfo.userAvatar?userInfoStore.userInfo.userAvatar:avatar"/>
                         <el-icon>
                             <CaretBottom/>
                         </el-icon>
