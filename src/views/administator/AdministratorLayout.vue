@@ -24,6 +24,7 @@ getCurAdminInfo().then(
         })
         router.push({path:'/login'})
       }else{
+        console.info(res.data)
         adminInfoStore.setAdminInfo(res.data)
       }
     }

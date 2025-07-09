@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {h, ref} from 'vue';
-import {deleteUser} from '../../api/admin'
+import {deleteUser,updateUser} from '../../api/admin'
 import {pageUsers} from '../../api/user'
 import {ElMessage, ElMessageBox} from "element-plus";
 
@@ -9,6 +9,17 @@ const searchUsername = ref('');
 const searchStatus = ref(0);
 const pageNum = ref(1);
 const pageSize = ref(10);
+const total = ref(0)
+// 处理分页大小改变
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  getUsers();
+};
+// 处理当前页码改变
+const handleCurrentChange = (newPage) => {
+  pageNum.value = newPage;
+  getUsers();
+};
 // 表格数据
 const userList = ref([]);
 // 计算属性：格式化状态显示
@@ -25,6 +36,7 @@ const getUsers = () => {
 
   pageUsers(query).then(res => {
     userList.value = res.data.records
+    total.value = res.data.total
   })
 }
 
@@ -85,9 +97,22 @@ const editUser = (user) => {
 };
 
 // 切换用户状态（冻结/解冻）
-const toggleUserStatus = (user) => {
-  // 这里应该调用后端接口进行状态切换
-  console.log('Toggle user status:', user);
+const toggleUserStatus = (row) => {
+  const newStatus = row.status === 0 ? 1 : 0;
+  const actionText = newStatus === 1 ? '冻结' : '解冻';
+  ElMessageBox.confirm(
+      `确定要${actionText}用户 ${row.username} 吗？`,
+      '确认操作',
+      { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }
+  ).then(async () => {
+    try {
+      await updateUser({id: row.id, status: newStatus});
+      ElMessage.success(`用户已${actionText}`);
+      getUsers();
+    } catch (error) {
+      ElMessage.error(`${actionText}用户失败`);
+    }
+  }).catch(() => {});
 };
 
 // 查看登录记录
@@ -121,18 +146,6 @@ const handleAvatarUploadSuccess = (response, file, fileList) => {
   editUserData.value.avatar = response.url; // 假设返回的是图片的URL
 };
 
-// 处理分页大小改变
-const handleSizeChange = (newSize) => {
-  pageSize.value = newSize;
-  getUsers();
-};
-
-// 处理当前页码改变
-const handleCurrentChange = (newPage) => {
-  pageNum.value = newPage;
-  getUsers();
-};
-
 getUsers()
 </script>
 
@@ -158,7 +171,7 @@ getUsers()
       </el-form-item>
     </el-form>
 
-    <el-table :data="userList" height="500" style="width: 100%">
+    <el-table :data="userList" style="width: 100%">
       <el-table-column prop="username" label="用户名" />
       <el-table-column prop="userGender" label="性别" />
       <el-table-column prop="birthday" label="生日" />
@@ -202,8 +215,9 @@ getUsers()
         :page-sizes="[5, 10, 20, 30, 40]"
         :background="true"
         layout="total, sizes, prev, pager, next, jumper"
-        :current-page="pageNum"
-        :page-size="pageSize"
+        v-model:current-page="pageNum"
+        v-model:page-size="pageSize"
+        :total="total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
     />

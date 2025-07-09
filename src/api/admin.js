@@ -2,10 +2,13 @@ import request from "@/utils/request";
 // 获取指定用户信息（管理员权限） GET    /api/users/{id}
 
 //获取当前管理员信息
-export const getCurAdminInfo = (user) => request.get('/api/adminInfo/getInfoMy',{params:user})
+export const getCurAdminInfo = (admin) => request.get('/api/adminInfo/getInfoMy',{params:admin})
 
 //id remove url?id=x 删除指定用户信息（管理员权限）
 export const deleteUser = (user) => request.get('/api/userInfo/removeUser',{params:user})
+
+//updateUser
+export const updateUser = (user) => request.patch('/api/userInfo/updateUser', user)
 
 // 待审核商家列表 GET    /api/admin/merchants/pending
 

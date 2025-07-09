@@ -144,7 +144,7 @@ const savePunish = () => {
         <el-input placeholder="商家名称" clearable />
       </el-form-item>
       <el-form-item label="审核状态">
-        <el-select placeholder="请选择审核状态">
+        <el-select placeholder="请选择审核状态" style="width: 150px;">
           <el-option label="待审核" value="pending" />
           <el-option label="已通过" value="approved" />
           <el-option label="未通过" value="rejected" />

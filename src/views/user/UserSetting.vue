@@ -1,58 +1,66 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import {getCurUser} from "@/api/user";
+import {useUserInfoStore} from "@/stores/userInfo";
+import {useRouter} from "vue-router";
+import {Plus} from "@element-plus/icons-vue";
+const userInfoStore = useUserInfoStore();
+const router = useRouter();
+import {updateUser} from "@/api/user"
+
+const imageUrl = ref('')
+
+const getUserInfo = ()=>{
+  getCurUser().then(res => {
+    if(!res.data){
+      ElMessage({
+        message:'未登入',
+        type:'warning'
+      })
+      router.push({path:'/login'})
+    }else{
+      userInfoStore.setUserInfo(res.data)
+    }
+  })
+}
+getUserInfo();
 
 // 表单数据模型
 const formData = ref({
-  avatar: '',
-  nickname: '',
-  signature: '',
-  gender: 'other',
-  birthday: null
+  id:userInfoStore.userInfo.id,
+  avatar: userInfoStore.userInfo.userAvatar,
+  username: userInfoStore.userInfo.username,
+  signature: userInfoStore.userInfo.signature,
+  gender: userInfoStore.userInfo.userGender,
+  birthday: userInfoStore.userInfo.birthday,
 });
 
 // 隐私设置状态
 const privacySettings = ref({
-  profileVisibility: 'everyone',
-  collectionVisibility: 'everyone',
-  commentVisibility: 'everyone',
-  activeStatus: true
+  profileVisibility: userInfoStore.userInfo.profileVisibile,
+  collectionVisibility: userInfoStore.userInfo.favoriteVisibile,
 });
 
 // 表单验证规则
 const rules = ref({
-  nickname: [
+  username: [
     { required: true, message: '请输入昵称', trigger: 'blur' }
   ],
   signature: [
-    { max: 200, message: '签名长度不能超过200个字符', trigger: 'blur' }
+    { max: 50, message: '签名长度不能超过50个字符', trigger: 'blur' }
   ]
 });
 
 // 表单引用
 const formRef = ref(null);
 
-// 上传接口地址，需根据实际情况修改
-const uploadUrl = 'https://example.com/upload';
-
 // 头像上传成功处理
-const handleAvatarUploadSuccess = (response) => {
-  formData.value.avatar = response.data.url;
-  ElMessage.success('头像上传成功');
-};
+const handleAvatarSuccess = (response, uploadFile) => {
+  imageUrl.value = URL.createObjectURL(uploadFile.raw)
+  formData.value.avatar = URL.createObjectURL(response.avatar);
+}
 
-// 头像上传前验证
-const beforeAvatarUpload = (file) => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-  if (!isJpgOrPng) {
-    ElMessage.error('只能上传 JPG/PNG 格式的图片');
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    ElMessage.error('图片大小不能超过 2MB');
-  }
-  return isJpgOrPng && isLt2M;
-};
 
 // 打开系统头像选择器
 const openSystemAvatarSelector = () => {
@@ -62,9 +70,12 @@ const openSystemAvatarSelector = () => {
 
 // 提交表单
 const submitForm = () => {
+  const submitData = { ...formData.value, ...privacySettings.value }
+
   formRef.value.validate((valid) => {
     if (valid) {
       // 处理与后端API的交互逻辑
+      updateUser(submitData).then(res => {getUserInfo()})
       ElMessage.success('表单提交成功');
     } else {
       ElMessage.error('表单验证失败，请检查输入');
@@ -77,10 +88,8 @@ const resetForm = () => {
   formRef.value.resetFields();
   formData.value.avatar = '';
   privacySettings.value = {
-    profileVisibility: 'everyone',
-    collectionVisibility: 'everyone',
-    commentVisibility: 'everyone',
-    activeStatus: true
+    profileVisibility: 0,
+    collectionVisibility: 0,
   };
 };
 </script>
@@ -101,41 +110,43 @@ const resetForm = () => {
       <div class="md:col-span-2 bg-white rounded-xl shadow-md p-6">
         <h2 class="text-xl font-semibold mb-4">个人信息</h2>
 
-        <!-- 头像设置区域 -->
-        <el-form-item label="头像">
-          <template #content>
-            <div class="flex items-center">
-              <div class="w-20 h-20 rounded-full bg-gray-200 overflow-hidden mr-4">
-                <img :src="formData.avatar || 'https://picsum.photos/200/200'" alt="用户头像" class="w-full h-full object-cover">
-              </div>
-              <div>
-                <el-upload
-                    :action="uploadUrl"
-                    :show-file-list="false"
-                    @success="handleAvatarUploadSuccess"
-                    :before-upload="beforeAvatarUpload"
-                >
-                  <el-button type="primary">上传新头像</el-button>
-                </el-upload>
-                <el-button type="text" @click="openSystemAvatarSelector">选择系统头像</el-button>
-              </div>
-            </div>
-          </template>
-        </el-form-item>
+        <div>
+          头像展示
+          <img
+              v-if="userInfoStore.userInfo.userAvatar"
+              :src="userInfoStore.userInfo.userAvatar"
+              alt=""  width="100" height="100"/>
+          <div v-else>暂无头像</div>
+        </div>
+
+        <div>
+          <!-- 头像设置区域 -->
+          <el-form-item label="头像修改">
+            <el-upload
+                class="avatar-uploader"
+                action="/api/file/upload"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+            >
+              <img v-if="imageUrl" :src="imageUrl" class="avatar" alt="avatar"/>
+              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+            </el-upload>
+          </el-form-item>
+        </div>
+
 
         <!-- 个人信息表单 -->
         <el-form :model="formData" :rules="rules" ref="formRef">
-          <el-form-item label="昵称" prop="nickname">
-            <el-input v-model="formData.nickname" placeholder="请输入您的昵称"></el-input>
+          <el-form-item label="昵称" prop="username">
+            <el-input v-model="formData.username" placeholder="请输入您的昵称"></el-input>
           </el-form-item>
           <el-form-item label="签名" prop="signature">
-            <el-input type="textarea" v-model="formData.signature" placeholder="介绍一下您自己..." rows="3"></el-input>
+            <el-input type="textarea" v-model="formData.signature" placeholder="介绍一下您自己..." rows="2"></el-input>
           </el-form-item>
           <el-form-item label="性别" prop="gender">
             <el-radio-group v-model="formData.gender">
-              <el-radio label="male">男</el-radio>
-              <el-radio label="female">女</el-radio>
-              <el-radio label="other">保密</el-radio>
+              <el-radio :label= 0>男</el-radio>
+              <el-radio :label= 1>女</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="生日" prop="birthday">
@@ -150,27 +161,15 @@ const resetForm = () => {
         <el-form :model="privacySettings">
           <el-form-item label="个人资料">
             <el-select v-model="privacySettings.profileVisibility">
-              <el-option label="所有人可见" value="everyone"></el-option>
-              <el-option label="仅关注者可见" value="followers"></el-option>
-              <el-option label="仅自己可见" value="onlyMe"></el-option>
+              <el-option label="所有人可见" :value= 0></el-option>
+              <el-option label="仅自己可见" :value= 1></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="收藏记录">
             <el-select v-model="privacySettings.collectionVisibility">
-              <el-option label="所有人可见" value="everyone"></el-option>
-              <el-option label="仅关注者可见" value="followers"></el-option>
-              <el-option label="仅自己可见" value="onlyMe"></el-option>
+              <el-option label="所有人可见" :value= 0></el-option>
+              <el-option label="仅自己可见" :value= 1></el-option>
             </el-select>
-          </el-form-item>
-          <el-form-item label="评论内容">
-            <el-select v-model="privacySettings.commentVisibility">
-              <el-option label="所有人可见" value="everyone"></el-option>
-              <el-option label="仅关注者可见" value="followers"></el-option>
-              <el-option label="仅自己可见" value="onlyMe"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="活跃状态">
-            <el-switch v-model="privacySettings.activeStatus"></el-switch>
           </el-form-item>
         </el-form>
       </div>
@@ -213,4 +212,33 @@ const resetForm = () => {
     }
   }
 }
+
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
+.avatar-uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
+
 </style>
+
