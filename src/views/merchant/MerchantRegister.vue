@@ -105,7 +105,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
       <el-main>
         <el-form :model="form" label-width="auto" style="max-width: 600px">
           <el-form-item label="店铺名字">
-            <el-input v-model="form.merchantName" placeholder="请输入店铺负责人姓名" />
+            <el-input v-model="form.merchantName" placeholder="请输入店铺名字" />
           </el-form-item>
           <el-form-item label="店面地址">
             <el-input v-model="form.address" placeholder="请输入店面地址" />
@@ -118,6 +118,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
           <el-form-item label="营业许可编号">
             <el-input v-model="form.licenseNumber" placeholder="请输入对应的营业许可编号" />
           </el-form-item>
+
           <el-form-item label="许可证图片">
             <el-upload
               class="avatar-uploader"
@@ -130,6 +131,8 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
           </el-form-item>
+
+
           <el-form-item label="其它许可证照片">
             <el-upload
                 v-model:file-list="fileList"
@@ -145,6 +148,8 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
               <img w-full :src="dialogImageUrl" alt="Preview Image" />
             </el-dialog>
           </el-form-item>
+
+
           <el-form-item label="卫生许可证图片">
             <el-upload
                 class="avatar-uploader"

@@ -1,7 +1,7 @@
 import request from "@/utils/request";
 
-// 商家注册（需审核）POST   /api/merchants/register
-export const merchantRegister = (query) => request.post('/api/merchantInfo/registerShop',query);
+// 商店注册（需审核）POST   /api/merchants/register
+export const merchantRegister = (query) => request.post('/api/shop/register',query);
 // 用户获取商家信息 GET    /api/merchants/getInfo
 export const getMerchantInfo = (query) => request.get(' /api/merchantInfo/getInfo',query);
 // 获取商家信息 GET    /api/merchants/getInfo
