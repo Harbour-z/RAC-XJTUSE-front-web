@@ -9,7 +9,7 @@ const form = reactive({
   merchantName: '',
   username:'',
   licenseNumber: '',
-  categoryId: [],
+  categoryId: '',
   description: '',
 })
 //提交注册表
@@ -172,23 +172,13 @@ const handleAvatarSuccess = (response, uploadFile) => {
 <!--            <el-switch v-model="form.delivery" />-->
 <!--          </el-form-item>-->
           <el-form-item label="商品类别">
-            <el-checkbox-group v-model="form.categoryId">
-              <el-checkbox value="中餐" name="type">
-                中餐
-              </el-checkbox>
-              <el-checkbox value="西餐" name="type">
-                西餐
-              </el-checkbox>
-              <el-checkbox value="日料" name="type">
-                日料
-              </el-checkbox>
-              <el-checkbox value="甜品" name="type">
-                甜品
-              </el-checkbox>
-              <el-checkbox value="快餐" name="type">
-                快餐
-              </el-checkbox>
-            </el-checkbox-group>
+            <el-radio-group v-model="form.categoryId" >
+              <el-radio-button label="中餐" value="1" />
+              <el-radio-button label="西餐" value="2" />
+              <el-radio-button label="日料" value="3" />
+              <el-radio-button label="甜品" value="4" />
+              <el-radio-button label="快餐" value="5" />
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="对店铺的描述">
             <el-input
