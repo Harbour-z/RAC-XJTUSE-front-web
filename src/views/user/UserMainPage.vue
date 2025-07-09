@@ -328,12 +328,12 @@ onMounted(() => {
         .cover-overlay {
           position: absolute;
           top: 0;
-          left: 0;
+          left: -20px;
           width: 100%;
           height: 100%;
           background: linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.1));
           display: flex;
-          justify-content: space-between;
+          justify-content: flex-end;
           align-items: flex-start;
           padding: 15px;
 
@@ -366,7 +366,7 @@ onMounted(() => {
             border: 3px solid white;
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
             margin-right: 15px;
-            margin-top: -40px;
+            margin-top: -5px;
             background: white;
           }
 
@@ -374,7 +374,7 @@ onMounted(() => {
             flex: 1;
 
             .merchant-name {
-              margin: 0 0 5px 0;
+              margin: 10px 0 5px 0;
               font-size: 18px;
               color: #303133;
               cursor: pointer;
