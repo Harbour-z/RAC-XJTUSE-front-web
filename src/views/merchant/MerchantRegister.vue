@@ -9,7 +9,7 @@ const form = reactive({
   merchantName: '',
   username:'',
   licenseNumber: '',
-  type: [],
+  categoryId: '',
   description: '',
 })
 //提交注册表
@@ -79,23 +79,10 @@ const textarea2 = ref('')
 //许可证图片栏
 import { ElMessage } from 'element-plus'
 const imageUrl = ref('')
-const handleAvatarSuccess: UploadProps['onSuccess'] = (
-    response,
-    uploadFile
-) => {
+const handleAvatarSuccess = (response, uploadFile) => {
   imageUrl.value = URL.createObjectURL(uploadFile.raw!)
 }
 
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  if (rawFile.type !== 'image/jpeg') {
-    ElMessage.error('Avatar picture must be JPG format!')
-    return false
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!')
-    return false
-  }
-  return true
-}
 </script>
 
 <template>
@@ -122,10 +109,9 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
           <el-form-item label="许可证图片">
             <el-upload
               class="avatar-uploader"
-              action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+              action="/api/shop/register"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
-              :before-upload="beforeAvatarUpload"
           >
             <img v-if="imageUrl" :src="imageUrl" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
@@ -186,23 +172,13 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 <!--            <el-switch v-model="form.delivery" />-->
 <!--          </el-form-item>-->
           <el-form-item label="商品类别">
-            <el-checkbox-group v-model="form.type">
-              <el-checkbox value="中餐" name="type">
-                中餐
-              </el-checkbox>
-              <el-checkbox value="西餐" name="type">
-                西餐
-              </el-checkbox>
-              <el-checkbox value="日料" name="type">
-                日料
-              </el-checkbox>
-              <el-checkbox value="甜品" name="type">
-                甜品
-              </el-checkbox>
-              <el-checkbox value="快餐" name="type">
-                快餐
-              </el-checkbox>
-            </el-checkbox-group>
+            <el-radio-group v-model="form.categoryId" >
+              <el-radio-button label="中餐" value="1" />
+              <el-radio-button label="西餐" value="2" />
+              <el-radio-button label="日料" value="3" />
+              <el-radio-button label="甜品" value="4" />
+              <el-radio-button label="快餐" value="5" />
+            </el-radio-group>
           </el-form-item>
           <el-form-item label="对店铺的描述">
             <el-input
