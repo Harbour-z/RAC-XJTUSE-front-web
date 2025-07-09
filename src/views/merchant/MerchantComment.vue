@@ -135,13 +135,13 @@ const getTypeText = (tags: string[]) => {
             </el-select>
           </el-form-item>
 
-          <el-form-item label="关键词">
-            <el-input v-model="filter.keyword" placeholder="搜索评论内容" clearable />
-          </el-form-item>
+<!--         暂时搁置 <el-form-item label="关键词">-->
+<!--            <el-input v-model="filter.keyword" placeholder="搜索评论内容" clearable />-->
+<!--          </el-form-item>-->
 
-          <el-form-item>
-            <el-button type="primary" @click="fetchComments">搜索</el-button>
-          </el-form-item>
+<!--          <el-form-item>-->
+<!--            <el-button type="primary" @click="fetchComments">搜索</el-button>-->
+<!--          </el-form-item>-->
         </el-form>
       </div>
 
