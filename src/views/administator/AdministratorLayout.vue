@@ -3,12 +3,9 @@
 import {
   CaretBottom,
   EditPen,
-  House,
-  MessageBox,
-  Promotion,
-  StarFilled,
+  HomeFilled,
   SwitchButton,
-  User,
+  User, UserFilled, View,
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
 import {useRouter} from "vue-router";
@@ -66,19 +63,19 @@ const handleCommand = (command) => {
                router>
         <el-menu-item index="/admin/UserManagement">
           <el-icon>
-            <House />
+            <UserFilled />
           </el-icon>
           <span>用户管理面板</span>
         </el-menu-item>
         <el-menu-item index="/admin/MerchantManagement">
           <el-icon>
-            <Promotion/>
+            <HomeFilled />
           </el-icon>
           <span>管理商家</span>
         </el-menu-item>
         <el-menu-item index="/admin/DataAnalysis">
           <el-icon>
-            <StarFilled />
+            <View />
           </el-icon>
           <span>数据可视化</span>
         </el-menu-item>
@@ -98,8 +95,6 @@ const handleCommand = (command) => {
                     </span>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="info" :icon="User">基本资料</el-dropdown-item>
-              <el-dropdown-item command="resetPassword" :icon="EditPen">重置密码</el-dropdown-item>
               <el-dropdown-item command="logout" :icon="SwitchButton">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
