@@ -12,8 +12,10 @@ const form = reactive({
   type: [],
   description: '',
 })
-
+//提交注册表
+import {merchantRegister} from "../../api/merchant";
 const onSubmit = () => {
+  merchantRegister(form)
   console.log('submit!')
 }
 
