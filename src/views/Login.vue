@@ -51,9 +51,12 @@ const handleLogin = async (e) => {
       default:
         throw new Error('未知用户身份')
     }
-
+    console.info(res.data)
     if (!res.data) {
       ElMessage.error('用户名或密码错误')
+    } else if(role==='管理员'){
+      ElMessage.success('你就是我的Master吗')
+      router.push({ path: '/admin/UserManagement' })
     } else {
       ElMessage.success(`${role}登录成功`)
       // 根据身份跳转到不同页面
@@ -63,9 +66,6 @@ const handleLogin = async (e) => {
           break
         case '商家':
           router.push({ path: '/merchant/MerchantMainPage' })
-          break
-        case '管理员':
-          router.push({ path: '/admin/UserManagement' })
           break
       }
     }
@@ -100,6 +100,7 @@ const handleRegister = async (e) => {
 
     // 根据角色调用不同API
     let res;
+    console.info(registerForm.value.role)
     if (registerForm.value.role === 'user') {
       res = await userRegister(registerData);
     } else {
