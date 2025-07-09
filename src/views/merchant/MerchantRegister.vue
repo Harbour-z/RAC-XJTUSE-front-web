@@ -7,6 +7,7 @@ const form = reactive({
   logitude: '',
   latitude:'',
   merchantName: '',
+  username:'',
   licenseNumber: '',
   type: [],
   description: '',
@@ -101,13 +102,16 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
       <el-header><h2 class="txt-style-mega-light txt-block-title__title">现在开始注册属于你的店铺！</h2></el-header>
       <el-main>
         <el-form :model="form" label-width="auto" style="max-width: 600px">
+          <el-form-item label="店铺名字">
+            <el-input v-model="form.merchantName" placeholder="请输入店铺负责人姓名" />
+          </el-form-item>
           <el-form-item label="店面地址">
             <el-input v-model="form.address" placeholder="请输入店面地址" />
             <el-input v-model="form.logitude" placeholder="经度" />
             <el-input v-model="form.latitude" placeholder="纬度" />
           </el-form-item>
           <el-form-item label="负责人">
-            <el-input v-model="form.merchantName" placeholder="请输入店铺负责人姓名" />
+            <el-input v-model="form.username" placeholder="请输入店铺负责人姓名" />
           </el-form-item>
           <el-form-item label="营业许可编号">
             <el-input v-model="form.licenseNumber" placeholder="请输入对应的营业许可编号" />
@@ -185,11 +189,11 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
               <el-checkbox value="日料" name="type">
                 日料
               </el-checkbox>
-              <el-checkbox value="中东料理" name="type">
-                中东料理
+              <el-checkbox value="甜品" name="type">
+                甜品
               </el-checkbox>
-              <el-checkbox value="泰料" name="type">
-                泰料
+              <el-checkbox value="快餐" name="type">
+                快餐
               </el-checkbox>
             </el-checkbox-group>
           </el-form-item>
