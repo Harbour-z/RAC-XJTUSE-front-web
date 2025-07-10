@@ -22,11 +22,11 @@ const activeCategory = ref('all')
 
 const categories = [
   { value: 'all', label: '全部' },
-  { value: 'chinese', label: '中餐' },
-  { value: 'western', label: '西餐' },
-  { value: 'japanese', label: '日料' },
-  { value: 'dessert', label: '甜品' },
-  { value: 'fastfood', label: '快餐' }
+  { value: '1', label: '中餐' },
+  { value: '2', label: '西餐' },
+  { value: '3', label: '日料' },
+  { value: '4', label: '甜品' },
+  { value: '5', label: '快餐' }
 ]
 
 const fetchMerchants = async () => {
@@ -179,7 +179,7 @@ const handleSearch = () => {
                 :type="activeCategory === category.value ? 'primary' : 'info'"
                 size="large"
                 effect="plain"
-                @click="activeCategory = category.value"
+                @click="activeCategory= category.value"
                 class="category-tag"
             >
               {{ category.label }}
