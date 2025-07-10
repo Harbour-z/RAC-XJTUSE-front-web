@@ -71,7 +71,7 @@ const openSystemAvatarSelector = () => {
 
 // 提交表单
 const submitForm = () => {
-  const submitData = { ...formData.value, ...privacySettings.value }
+  const submitData = { ...formRef.value, ...privacySettings.value }
 
   formRef.value.validate((valid) => {
     if (valid) {
@@ -89,8 +89,8 @@ const resetForm = () => {
   formRef.value.resetFields();
   formData.value.userAvatar = '';
   privacySettings.value = {
-    profileVisible: 0,
-    favoriteVisible: 0,
+    profileVisible: privacySettings.value.profileVisible,
+    favoriteVisible: privacySettings.value.favoriteVisible,
   };
 };
 </script>
