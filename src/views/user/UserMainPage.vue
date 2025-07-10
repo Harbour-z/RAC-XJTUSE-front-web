@@ -48,8 +48,8 @@ const fetchMerchants = async () => {
       {
         id: 1,
         name: '美食家餐厅',
-        avatar: '',
-        cover: '',
+        avatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.fBW6sR4CLav2U8IEFCtB5AAAAA?w=177&h=112&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+        cover: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.g0tW_pfGbUbPmOAx43Vu9wHaFA?w=241&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
         rating: 4.8,
         category: '1', // 修改为对应分类ID
         distance: '1.2km',
@@ -61,8 +61,8 @@ const fetchMerchants = async () => {
       {
         id: 2,
         name: '咖啡时光',
-        avatar: '',
-        cover: '',
+        avatar: 'https://tse2-mm.cn.bing.net/th/id/OIP-C._A_0HkO5gSTQawBVGDSvFwHaEK?w=283&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7',
+        cover: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.3eJB52oYPSxSDEa2nzl6cgHaEK?w=308&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7',
         rating: 4.5,
         category: '4', // 修改为对应分类ID
         distance: '0.8km',
@@ -74,8 +74,8 @@ const fetchMerchants = async () => {
       {
         id: 3,
         name: '寿司大师',
-        avatar:'',
-        cover: '',
+        avatar:'https://tse1-mm.cn.bing.net/th/id/OIP-C.s9rL6f7EKY1GQ2UilynOvwAAAA?w=180&h=112&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+        cover: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.G2gy-YNq9Qk0TVU8_o8LBQHaH8?w=154&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
         rating: 4.9,
         category: '3', // 修改为对应分类ID
         distance: '2.5km',
@@ -86,8 +86,8 @@ const fetchMerchants = async () => {
       {
         id: 4,
         name: '披萨工坊',
-        avatar:'',
-        cover: '',
+        avatar:'https://tse3-mm.cn.bing.net/th/id/OIP-C.u29dMeBV-mtgkvYDdMPA_gHaFj?w=213&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7',
+        cover: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.cPOlbHYjDyqSEaMrT4y0jAHaEK?w=321&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
         rating: 4.3,
         category: '2', // 修改为对应分类ID
         distance: '1.8km',
@@ -100,7 +100,7 @@ const fetchMerchants = async () => {
         id: 5,
         name: '甜蜜时光甜品屋',
         avatar: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.abcdefghijkHaHa?pid=ImgDet',
-        cover: 'https://via.placeholder.com/800x400?text=甜蜜时光甜品屋',
+        cover: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.MDBszUATeXlIIyWUaV2KSwHaHG?w=195&h=187&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
         rating: 4.7,
         category: '4', // 甜品分类
         distance: '1.5km',
@@ -112,8 +112,8 @@ const fetchMerchants = async () => {
       {
         id: 6,
         name: '川味小厨',
-        avatar: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.klmnopqrstUVWX?pid=ImgDet',
-        cover: 'https://via.placeholder.com/800x400?text=川味小厨',
+        avatar: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.h6QMVybvMqecL4Hu6Z2ZMQHaFB?w=222&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7',
+        cover: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.sy-dbykMJuMZ4n-cZMtBOgHaEK?w=289&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
         rating: 4.6,
         category: '1', // 中餐分类
         distance: '2.0km',
@@ -140,7 +140,9 @@ const toggleFavorite = (id: number) => {
 }
 
 onMounted(() => {
-  fetchMerchants()
+  handleSearch()
+  // 如果演示效果不如意就启用下边这个
+  // fetchMerchants()
 })
 
 //搜索框
@@ -160,7 +162,7 @@ const handleSearch = () => {
           id: shop.id,
           name: shop.merchantName,
           avatar: shop.avatar || '',
-          cover: shop.cover || '',
+          cover: shop.cover || 'https://tse4-mm.cn.bing.net/th/id/OIP-C.GivG8lAx8I6wGz8LBaqYKgHaFj?w=202&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
           rating: shop.avgRating || 0,
           category: String(shop.categoryId) || 'all',
           distance: shop.distance || '1.2km',
