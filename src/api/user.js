@@ -19,3 +19,10 @@ export const pageUsers = (query) => request.get('/api/userInfo/listPage',{params
 
 //搜索附近所选条件的商家
 export const pageShops = (query) => request.get('/api/shop/listPage',{params:query})
+
+//获得当前用户所发表的所有评论
+export const pageComments = (query) => request.get('/api/comment/listComments',{params:query})
+//更新所选评论
+export const updateComment = (query) => request.post('/api/comment/updateComment',query)
+//删除所选的评论
+export const deleteCurComment = (query) => request.get('/api/comment/deleteComment',{params:query})
