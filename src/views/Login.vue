@@ -107,7 +107,7 @@ const handleRegister = async (e) => {
       res = await merchantRegister(registerData);
     }
 
-    if (res.data) {
+    if (res.status) {
       ElMessage.success('注册成功');
       // 自动切换到登录界面
       container.classList.remove("sign-up-mode");
@@ -130,7 +130,7 @@ const handleRegister = async (e) => {
       ElMessage.error('注册失败');
     }
   } catch (error) {
-    ElMessage.error(`注册失败: ${error.message}`);
+    //ElMessage.error(`注册失败: ${error.message}`);
   }
 }
 

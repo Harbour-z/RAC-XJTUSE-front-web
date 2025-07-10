@@ -19,9 +19,24 @@ const form = reactive({
 import {merchantRegister} from "../../api/merchant";
 const onSubmit = () => {
   merchantRegister(form)
-  console.log('submit!')
-  
-}
+      .then(res => {
+        if (res.status == true || res.success) { // 假设成功返回的code是200或有success字段
+          console.log('submit!');
+          alert("店铺创建成功！")
+          // 这里可以添加成功后的其他操作，比如跳转页面等
+        } else {
+          // 显示后端返回的错误信息
+          console.error(res.message || '店铺创建失败');
+          // 这里可以添加错误提示，比如使用alert或UI组件的提示
+          alert(res.message || '店铺创建失败');
+        }
+      })
+      .catch(error => {
+        console.error('请求失败:', error);
+        // 处理网络错误或其他异常
+        alert('请求失败，请稍后重试');
+      });
+};
 
 
 //图片列的
