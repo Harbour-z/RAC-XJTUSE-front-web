@@ -48,44 +48,6 @@ const fetchMerchants = async () => {
         description: '专注传统美食20年，为您带来最地道的家乡味道',
         isFavorite: true
       },
-      {
-        id: 2,
-        name: '咖啡时光',
-        avatar: 'https://via.placeholder.com/80',
-        cover: 'https://via.placeholder.com/800x400?text=咖啡时光',
-        rating: 4.5,
-        category: 'dessert',
-        distance: '0.8km',
-        deliveryTime: '25分钟',
-        promotion: '下午茶套餐7折',
-        description: '都市中的一片宁静，品味咖啡与生活的美好',
-        isFavorite: false
-      },
-      {
-        id: 3,
-        name: '寿司大师',
-        avatar: 'https://via.placeholder.com/80',
-        cover: 'https://via.placeholder.com/800x400?text=寿司大师',
-        rating: 4.9,
-        category: 'japanese',
-        distance: '2.5km',
-        deliveryTime: '45分钟',
-        description: '正宗日式料理，由日本师傅亲自操刀',
-        isFavorite: true
-      },
-      {
-        id: 4,
-        name: '披萨工坊',
-        avatar: 'https://via.placeholder.com/80',
-        cover: 'https://via.placeholder.com/800x400?text=披萨工坊',
-        rating: 4.3,
-        category: 'western',
-        distance: '1.8km',
-        deliveryTime: '35分钟',
-        promotion: '买一送一',
-        description: '纯手工制作，意大利传统风味',
-        isFavorite: false
-      }
     ]
   } catch (error) {
     console.error('获取商家数据失败', error)
@@ -114,7 +76,7 @@ onMounted(() => {
           <h1><i class="el-icon-house"></i> 发现附近好店</h1>
           <div class="header-actions">
             <el-input
-                placeholder="搜索商家、商品..."
+                placeholder="搜索商家名字"
                 class="search-input"
                 size="large"
             >

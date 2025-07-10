@@ -124,13 +124,13 @@ const getTypeText = (tags: string[]) => {
       <div class="filter-section">
         <el-form :inline="true" :model="filter">
           <el-form-item label="评分">
-            <el-select v-model="filter.rating" placeholder="全部评分" clearable>
+            <el-select v-model="filter.rating" placeholder="全部评分" clearable style="width: 150px;">
               <el-option v-for="item in ratingOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
 
           <el-form-item label="评论类型">
-            <el-select v-model="filter.type" placeholder="全部类型" clearable>
+            <el-select v-model="filter.type" placeholder="全部类型" clearable style="width: 150px;">
               <el-option v-for="item in typeOptions" :key="item.value" :label="item.label" :value="item.value" />
             </el-select>
           </el-form-item>
