@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import {ElMessage, ElMessageBox, type UploadProps, type UploadUserFile} from 'element-plus'
 import {pageComments, updateComment , deleteCurComment} from "@/api/user";
 import {useUserInfoStore} from "@/stores/userInfo";
+import {Plus} from "@element-plus/icons-vue";
 const userInfoStore = useUserInfoStore();
-
-
+const fileList = ref<UploadUserFile[]>([])
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+  console.log(uploadFile, uploadFiles)
+}
+const handleOtherSuccess = (res, uploadFile) => {
+  console.log(res)
+  console.log(uploadFile)
+  console.log(uploadFile.response.data.url)
+  editForm.value.images.push(uploadFile.response.data.url)
+}
 
 interface Comment {
   id: number
@@ -16,7 +25,7 @@ interface Comment {
   serviceRating: number
   tasteRating: number
   content: string
-  images: string
+  images: string[]
   createdAt: string
   isEdited: boolean
 }
@@ -30,7 +39,7 @@ const editForm = ref({
   serviceRating: 0,
   tasteRating: 0,
   content: '',
-  images: ''
+  images:[]
 })
 
 const showEditForm = ref(0)
@@ -69,7 +78,7 @@ const initEditForm = (comment: Comment) => {
     serviceRating: comment.serviceRating,
     tasteRating: comment.tasteRating,
     content: comment.content,
-    images: comment.images,
+    images: comment.images || [],
   }
   showEditForm.value = comment.id
 }
@@ -84,7 +93,7 @@ const cancelEdit = () => {
     serviceRating: 0,
     tasteRating: 0,
     content: '',
-    images: '',
+    images: [],
   }
 }
 
@@ -228,19 +237,33 @@ onMounted(() => {
                 <el-form-item label="评论内容" prop="content" required>
                   <el-input v-model="editForm.content" type="textarea" :rows="4" placeholder="请输入您的评论" />
                 </el-form-item>
+                <el-form-item label="照片上传">
+                  <el-upload
+                      v-model:file-list="fileList"
+                      action="/api/file/upload"
+                      list-type="picture-card"
+                      :on-preview="handlePictureCardPreview"
+                      :on-remove="handleRemove"
+                      :on-success="handleOtherSuccess"
+                  >
+                    <el-icon><Plus /></el-icon>
+                  </el-upload>
+                  <el-dialog v-model="dialogVisible" width="80%" top="5vh">
+                    <img :src="dialogImageUrl" style="width: 100%;" alt="预览图片" />
+                  </el-dialog>
+                </el-form-item>
                 <el-form-item>
                   <el-button type="primary" @click="submitEdit">保存修改</el-button>
                   <el-button @click="cancelEdit">取消</el-button>
                 </el-form-item>
               </el-form>
+
+
             </div>
           </el-collapse-transition>
         </div>
       </div>
 
-      <el-dialog v-model="dialogVisible" width="80%" top="5vh">
-        <img :src="dialogImageUrl" style="width: 100%;" alt="预览图片" />
-      </el-dialog>
     </el-card>
   </div>
 </template>
