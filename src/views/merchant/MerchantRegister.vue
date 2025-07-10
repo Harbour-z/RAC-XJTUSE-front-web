@@ -20,8 +20,9 @@ import {merchantRegister} from "../../api/merchant";
 const onSubmit = () => {
   merchantRegister(form)
       .then(res => {
-        if (res.code === 200 || res.success) { // 假设成功返回的code是200或有success字段
+        if (res.status == true || res.success) { // 假设成功返回的code是200或有success字段
           console.log('submit!');
+          alert("店铺创建成功！")
           // 这里可以添加成功后的其他操作，比如跳转页面等
         } else {
           // 显示后端返回的错误信息

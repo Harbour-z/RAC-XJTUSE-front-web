@@ -3,11 +3,13 @@ import request from "@/utils/request";
 // 商店注册（需审核）POST   /api/merchants/register
 export const merchantRegister = (query) => request.post('/api/shop/register',query);
 // 用户获取商家信息 GET    /api/merchants/getInfo
-export const getMerchantInfo = (query) => request.get(' /api/merchantInfo/getInfo',query);
+export const getMerchantInfo = (query) => request.get(' /api/shop/search', {params:{merchantName:query}});
 // 获取商家信息 GET    /api/merchants/getInfo
 export const getCurMerchantInfo = (query) => request.get(' /api/merchantInfo/getInfoMy',query);
 // 更新商家信息 POST    /api/merchants/updateInfo
 export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/updateInfo',query);
+
+export const getMerchantById = (query) => request.get('/api/merchantInfo/getById',{params:query})
 
 export const pageMerchants = (query) => request.get('/api/merchantInfo/listPage',{params:query})
 
