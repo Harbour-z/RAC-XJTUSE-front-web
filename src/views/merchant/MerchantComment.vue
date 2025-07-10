@@ -55,7 +55,7 @@ const fetchComments = () => {
         rating: 5,
         content: '菜品非常好吃，服务也很周到！',
         images: [
-          ''
+          'https://tse4-mm.cn.bing.net/th/id/OIP-C.D_RBX3ACiz3FjMvyHtGPJQHaIW?w=175&h=198&c=7&r=0&o=5&dpr=1.8&pid=1.7'
         ],
         date: '2023-05-15',
         tags: ['好评']

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { StarFilled, Location, Timer, Goods, Discount } from '@element-plus/icons-vue'
+import MerchantComment from "@/views/merchant/MerchantComment.vue";
 
 const merchant = ref({
   id: 1,
   name: '美食家餐厅',
-  avatar: 'https://via.placeholder.com/100',
-  cover: 'https://via.placeholder.com/1200x400?text=美食家餐厅',
+  avatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.fBW6sR4CLav2U8IEFCtB5AAAAA?w=177&h=112&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+  cover: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.g0tW_pfGbUbPmOAx43Vu9wHaFA?w=241&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
   rating: 4.8,
   monthlySales: 1289,
   deliveryTime: '30分钟',
@@ -40,7 +41,7 @@ const merchant = ref({
       id: 1,
       name: '招牌红烧肉',
       price: 58,
-      image: 'https://via.placeholder.com/200x200?text=招牌红烧肉',
+      image: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.hGb1JdkokYJfSMDHopAOEgHaE7?w=259&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
       sales: 328,
       rating: 4.9
     },
@@ -48,7 +49,7 @@ const merchant = ref({
       id: 2,
       name: '清蒸鲈鱼',
       price: 68,
-      image: 'https://via.placeholder.com/200x200?text=清蒸鲈鱼',
+      image: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.9SKsMYuV9f8jE-h7HxWSmAAAAA?w=186&h=185&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
       sales: 256,
       rating: 4.8
     },
@@ -56,7 +57,7 @@ const merchant = ref({
       id: 3,
       name: '宫保鸡丁',
       price: 38,
-      image: 'https://via.placeholder.com/200x200?text=宫保鸡丁',
+      image: 'https://tse4-mm.cn.bing.net/th/id/OIP-C.v_BBCVsDdvOLk5ytyghyHQHaHa?w=179&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
       sales: 412,
       rating: 4.7
     }
@@ -195,7 +196,7 @@ onMounted(() => {
 
         <el-tab-pane label="评价" name="reviews">
           <div class="reviews-section">
-            <p>这里是商家评价内容</p>
+            <MerchantComment />
           </div>
         </el-tab-pane>
 

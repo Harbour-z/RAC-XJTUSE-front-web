@@ -3,7 +3,7 @@ import {h, ref} from 'vue';
 import {deleteUser,updateUser} from '../../api/admin'
 import {pageUsers} from '../../api/user'
 import {ElMessage, ElMessageBox} from "element-plus";
-
+import avatar from '@/assets/default.png'
 // 表格数据
 const userList = ref([]);
 // 搜索相关
@@ -212,7 +212,7 @@ getUsers()
       <el-table-column prop="createTime" label="注册时间" />
       <el-table-column prop="avatar" label="头像">
         <template #default="scope">
-          <img height="50" :src="scope.row.userAvatar" alt="Avatar" />
+          <img height="50" :src="scope.row.userAvatar?scope.row.userAvatar:avatar" alt="Avatar" />
         </template>
       </el-table-column>
 

@@ -3,15 +3,21 @@ import request from "@/utils/request";
 // 商店注册（需审核）POST   /api/merchants/register
 export const merchantRegister = (query) => request.post('/api/shop/register',query);
 // 用户获取商家信息 GET    /api/merchants/getInfo
-export const getMerchantInfo = (query) => request.get(' /api/shop/search', {params:{merchantName:query}});
+export const getMerchantInfo = (merchantName, category) => request.get('/api/shop/search', {params: {
+        merchantName: merchantName,
+        categoryId: category !== 'all' ? category : undefined // 如果是'all'就不传这个参数
+    }
+});
 // 获取商家信息 GET    /api/merchants/getInfo
 export const getCurMerchantInfo = (query) => request.get(' /api/merchantInfo/getInfoMy',query);
 // 更新商家信息 POST    /api/merchants/updateInfo
 export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/updateInfo',query);
 
-export const getMerchantById = (query) => request.get('/api/merchantInfo/getById',{params:query})
+export const getShopByName = (query) => request.post('/api/shop/getByName',query)
 
 export const pageMerchants = (query) => request.get('/api/merchantInfo/listPage',{params:query})
+
+export const getQulificationById = (query1) => request.post('/api/merchantQulification/getByMerchantId',query1)
 
 //不知道要不要加商品
 // // 获取商品列表 GET    /api/merchants/getProducts
