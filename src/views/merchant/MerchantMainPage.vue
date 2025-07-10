@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { StarFilled, Location, Timer, Goods, Discount } from '@element-plus/icons-vue'
+import MerchantComment from "@/views/merchant/MerchantComment.vue";
 
 const merchant = ref({
   id: 1,
@@ -195,7 +196,7 @@ onMounted(() => {
 
         <el-tab-pane label="评价" name="reviews">
           <div class="reviews-section">
-            <p>这里是商家评价内容</p>
+            <MerchantComment />
           </div>
         </el-tab-pane>
 
