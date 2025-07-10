@@ -160,11 +160,11 @@ const handleSearch = () => {
                 class="search-input"
                 size="large"
             >
-            <template #suffix>
-              <el-icon class="search-icon" @click="handleSearch">
-                <Search />
-              </el-icon>
-            </template>
+              <template #suffix>
+                <el-icon class="search-icon" @click="handleSearch">
+                  <Search />
+                </el-icon>
+              </template>
             </el-input>
           </div>
         </div>
