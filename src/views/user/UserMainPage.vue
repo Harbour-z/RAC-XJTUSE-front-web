@@ -141,9 +141,9 @@ const toggleFavorite = (id: number) => {
 
 onMounted(() => {
   // 这一个是正确的实现方法（如果测试数据库图片都有可以用这个）
-  handleSearch()
+  // handleSearch()
   // 这一个演示来说内置了网络图片效果比较好
-  // fetchMerchants()
+  fetchMerchants()
 })
 
 //搜索框
