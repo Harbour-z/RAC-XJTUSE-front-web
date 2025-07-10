@@ -71,7 +71,7 @@ const openSystemAvatarSelector = () => {
 
 // 提交表单
 const submitForm = () => {
-  const submitData = { ...formRef.value, ...privacySettings.value }
+  const submitData = { ...formData.value, ...privacySettings.value }
 
   formRef.value.validate((valid) => {
     if (valid) {
