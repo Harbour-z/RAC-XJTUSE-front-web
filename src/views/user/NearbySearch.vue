@@ -107,6 +107,7 @@ const loading = ref(false); //加载状态
 
 
 const clickHandler = (e) => {
+  console.log(e.point.value);
   currentShop.value = e.point.data;
   dialogVisible.value = true
 };
