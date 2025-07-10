@@ -48,6 +48,44 @@ const fetchMerchants = async () => {
         description: '专注传统美食20年，为您带来最地道的家乡味道',
         isFavorite: true
       },
+      {
+        id: 2,
+        name: '咖啡时光',
+        avatar: 'https://via.placeholder.com/80',
+        cover: 'https://via.placeholder.com/800x400?text=咖啡时光',
+        rating: 4.5,
+        category: 'dessert',
+        distance: '0.8km',
+        deliveryTime: '25分钟',
+        promotion: '下午茶套餐7折',
+        description: '都市中的一片宁静，品味咖啡与生活的美好',
+        isFavorite: false
+      },
+      {
+        id: 3,
+        name: '寿司大师',
+        avatar: 'https://via.placeholder.com/80',
+        cover: 'https://via.placeholder.com/800x400?text=寿司大师',
+        rating: 4.9,
+        category: 'japanese',
+        distance: '2.5km',
+        deliveryTime: '45分钟',
+        description: '正宗日式料理，由日本师傅亲自操刀',
+        isFavorite: true
+      },
+      {
+        id: 4,
+        name: '披萨工坊',
+        avatar: 'https://via.placeholder.com/80',
+        cover: 'https://via.placeholder.com/800x400?text=披萨工坊',
+        rating: 4.3,
+        category: 'western',
+        distance: '1.8km',
+        deliveryTime: '35分钟',
+        promotion: '买一送一',
+        description: '纯手工制作，意大利传统风味',
+        isFavorite: false
+      }
     ]
   } catch (error) {
     console.error('获取商家数据失败', error)
@@ -66,6 +104,47 @@ const toggleFavorite = (id: number) => {
 onMounted(() => {
   fetchMerchants()
 })
+
+//搜索框
+import {getMerchantInfo} from "@/api/merchant"
+import { Search } from '@element-plus/icons-vue'
+const searchQuery = ref('') // 绑定搜索框输入值
+// 辅助函数：随机选取最多 n 条数据
+function getRandomItems(array, n) {
+  if (array.length <= n) return [...array];
+  // 随机打乱数组并取前n条
+  return [...array].sort(() => 0.5 - Math.random()).slice(0, n);
+}
+const handleSearch = () => {
+  console.log('搜索关键词:', searchQuery.value)
+  // 这里添加搜索逻辑，比如过滤商家列表
+  getMerchantInfo( searchQuery.value )
+      .then(response => {
+        // 处理返回的商家数据
+        const mappedMerchants = response.data.records.map(shop => ({
+          id: shop.id,
+          name: shop.merchantName,      // 后端字段可能是 merchantName
+          avatar: shop.avatar || 'https://via.placeholder.com/80',  // 默认头像
+          cover: shop.cover || 'https://via.placeholder.com/800x400', // 默认封面
+          rating: shop.avgRating || 0,   // 后端可能是 avgRating
+          category: shop.categoryId || 'all', // 后端可能是 categoryId
+          distance: shop.distance || '1.2km', // 默认距离
+          deliveryTime: shop.deliveryTime || '30分钟', // 默认时间
+          promotion: shop.promotion || '', // 促销信息
+          description: shop.description || '暂无描述',
+          isFavorite: false              // 默认未收藏
+        }));
+
+        // 2. 随机选取最多6条
+        const randomMerchants = getRandomItems(mappedMerchants, 6);
+
+        // 3. 更新到 merchants
+        merchants.value = randomMerchants;
+      })
+      .catch(error => {
+        console.error('搜索失败:', error);
+      });
+}
 </script>
 
 <template>
@@ -76,13 +155,16 @@ onMounted(() => {
           <h1><i class="el-icon-house"></i> 发现附近好店</h1>
           <div class="header-actions">
             <el-input
+                v-model="searchQuery"
                 placeholder="搜索商家名字"
                 class="search-input"
                 size="large"
             >
-              <template #prefix>
-                <el-icon><Search /></el-icon>
-              </template>
+            <template #suffix>
+              <el-icon class="search-icon" @click="handleSearch">
+                <Search />
+              </el-icon>
+            </template>
             </el-input>
           </div>
         </div>
@@ -163,6 +245,18 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+.search-icon {
+  cursor: pointer;
+  color: #606266; // 默认颜色
+  font-size: 16px;
+  margin-right: 8px;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #6a11cb; // 悬停时使用主题色
+  }
+}
+
 .user-main-page {
   padding: 20px;
   background: #f5f7fa;
