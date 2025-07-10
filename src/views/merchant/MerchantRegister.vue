@@ -11,6 +11,9 @@ const form = reactive({
   licenseNumber: '',
   categoryId: '',
   description: '',
+  license:'',
+  health:'',
+  otherPermit:[],
 })
 //提交注册表
 import {merchantRegister} from "../../api/merchant";
@@ -26,40 +29,7 @@ import { Plus } from '@element-plus/icons-vue'
 
 import type { UploadProps, UploadUserFile } from 'element-plus'
 
-const fileList = ref<UploadUserFile[]>([
-  {
-    name: 'food.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-  {
-    name: 'plant-1.png',
-    url: '/images/plant-1.png',
-  },
-  {
-    name: 'food.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-  {
-    name: 'plant-2.png',
-    url: '/images/plant-2.png',
-  },
-  {
-    name: 'food.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-  {
-    name: 'figure-1.png',
-    url: '/images/figure-1.png',
-  },
-  {
-    name: 'food.jpeg',
-    url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100',
-  },
-  {
-    name: 'figure-2.png',
-    url: '/images/figure-2.png',
-  },
-])
+const fileList = ref<UploadUserFile[]>([])
 
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
@@ -67,8 +37,14 @@ const dialogVisible = ref(false)
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
   console.log(uploadFile, uploadFiles)
 }
+const handleOtherSuccess = (res, uploadFile) => {
+  console.log(res)
+  console.log(uploadFile)
+  console.log(uploadFile.response.data.url)
+  form.otherPermit.push(uploadFile.response.data.url)
+}
 
-const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+const handlePictureCardPreview = (res,uploadFile) => {
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
@@ -77,10 +53,16 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 const textarea2 = ref('')
 
 //许可证图片栏
-import { ElMessage } from 'element-plus'
-const imageUrl = ref('')
-const handleAvatarSuccess = (response, uploadFile) => {
-  imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+const imageUrl1 = ref('')
+const handleLicenseSuccess = (res, uploadFile) => {
+  imageUrl1.value = URL.createObjectURL(uploadFile.raw!)
+  form["license"] = res.data.url;
+}
+//卫生许证
+const imageUrl2 = ref('')
+const handleHealthSuccess = (res, uploadFile) => {
+  imageUrl2.value = URL.createObjectURL(uploadFile.raw!)
+  form["health"] = res.data.url;
 }
 
 </script>
@@ -108,12 +90,12 @@ const handleAvatarSuccess = (response, uploadFile) => {
 
           <el-form-item label="许可证图片">
             <el-upload
-              class="avatar-uploader"
-              action="/api/shop/register"
-              :show-file-list="false"
-              :on-success="handleAvatarSuccess"
-          >
-            <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                class="avatar-uploader"
+                action="/api/file/upload"
+                :show-file-list="false"
+                :on-success="handleLicenseSuccess"
+            >
+            <img v-if="imageUrl1" :src="imageUrl1" class="avatar" />
             <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
           </el-upload>
           </el-form-item>
@@ -122,10 +104,11 @@ const handleAvatarSuccess = (response, uploadFile) => {
           <el-form-item label="其它许可证照片">
             <el-upload
                 v-model:file-list="fileList"
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                action="/api/file/upload"
                 list-type="picture-card"
                 :on-preview="handlePictureCardPreview"
                 :on-remove="handleRemove"
+                :on-success="handleOtherSuccess"
             >
               <el-icon><Plus /></el-icon>
             </el-upload>
@@ -139,12 +122,11 @@ const handleAvatarSuccess = (response, uploadFile) => {
           <el-form-item label="卫生许可证图片">
             <el-upload
                 class="avatar-uploader"
-                action="https://run.mocky.io/v3/9d059bf9-4660-45f2-925d-ce80ad6c4d15"
+                action="/api/file/upload"
                 :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-                :before-upload="beforeAvatarUpload"
+                :on-success="handleHealthSuccess"
             >
-              <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+              <img v-if="imageUrl2" :src="imageUrl2" class="avatar" />
               <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
             </el-upload>
           </el-form-item>
