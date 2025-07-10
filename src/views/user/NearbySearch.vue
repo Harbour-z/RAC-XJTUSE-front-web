@@ -231,6 +231,7 @@ watchEffect(() => {
       title="店铺信息"
       width="500"
   >
+
     <div v-if="currentShop">
       <p><strong>店铺名：</strong>{{ currentShop.merchantName }}</p>
       <p><strong>地址：</strong>{{ currentShop.address }}</p>
