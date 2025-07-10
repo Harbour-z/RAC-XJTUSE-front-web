@@ -4,6 +4,8 @@ import {deleteUser,updateUser} from '../../api/admin'
 import {pageUsers} from '../../api/user'
 import {ElMessage, ElMessageBox} from "element-plus";
 
+// 表格数据
+const userList = ref([]);
 // 搜索相关
 const searchUsername = ref('');
 const searchStatus = ref(0);
@@ -20,8 +22,7 @@ const handleCurrentChange = (newPage) => {
   pageNum.value = newPage;
   getUsers();
 };
-// 表格数据
-const userList = ref([]);
+
 // 计算属性：格式化状态显示
 const formatStatus = (status: number) => {
   return status === 0 ? '正常' : '冻结';
@@ -106,7 +107,6 @@ const saveEdit = () => {
     phone: editUserData.value.phone,
     email: editUserData.value.email,
   };
-
   updateUser(user)
       .then(res => {
         console.info(res.code)
@@ -190,7 +190,6 @@ getUsers()
         <el-button type="primary" @click="getUsers">查询</el-button>
       </el-form-item>
     </el-form>
-
     <el-table :data="userList" style="width: 100%">
       <el-table-column fixed prop="username" label="用户名" width="150%" />
       <el-table-column label="性别" >
