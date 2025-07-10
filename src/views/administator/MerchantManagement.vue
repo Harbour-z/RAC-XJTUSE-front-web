@@ -1,5 +1,57 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {h, ref} from 'vue';
+import {ElMessage, ElMessageBox} from "element-plus";
+import {
+  updateMerchant,deleteMerchant
+} from '../../api/admin'
+import {pageMerchants} from '../../api/merchant'
+
+const merchantList = ref([]);
+const searchUsername = ref('');
+const searchStatus = ref(0);
+const pageNum = ref(1);
+const pageSize = ref(10);
+const total = ref(0)
+
+// 处理分页大小改变
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  getMerchants();
+};
+// 处理当前页码改变
+const handleCurrentChange = (newPage) => {
+  pageNum.value = newPage;
+  getMerchants();
+};
+
+const formatStatus = (status: number) => {
+  switch(status) {
+    case 0:
+      return '待审核'
+    case 1:
+      return '已通过'
+    case 2:
+      return '未通过'
+    case 3:
+      return '冻结'
+    default:
+      throw new Error('未知用户身份')
+  }
+};
+
+const getMerchants = () => {
+  const query = {
+    pageNum: pageNum.value,
+    pageSize: pageSize.value,
+    username: searchUsername.value,
+    status: searchStatus.value
+  }
+
+  pageMerchants(query).then(res => {
+    merchantList.value = res.data.records
+    total.value = res.data.total
+  })
+}
 
 // 编辑对话框是否可见
 const editDialogVisible = ref(false);
@@ -29,22 +81,10 @@ const currentAuditMerchant = ref(null);
 // 当前处罚的商家
 const currentPunishMerchant = ref(null);
 
-// 删除商家
-const deleteMerchant = (row) => {
-  // 实现删除逻辑
-  console.log('Delete merchant:', row);
-};
-
 // 编辑商家
 const editMerchant = (row) => {
   editMerchantData.value = { ...row };
   editDialogVisible.value = true;
-};
-
-// 冻结商家
-const freezeMerchant = (row) => {
-  // 实现冻结逻辑
-  console.log('Freeze merchant:', row);
 };
 
 // 查看审核详情
@@ -105,31 +145,38 @@ const handleImageUploadSuccess = (response, file, fileList) => {
 
 // 处罚商家
 const punishMerchant = (row) => {
+  punishDialogVisible.value = true;
   currentPunishMerchant.value = row;
   punishData.value = {
     punishReason: '',
     punishMeasure: '',
   };
-  punishDialogVisible.value = true;
-};
-
-// 取消处罚
-const cancelPunish = () => {
-  punishDialogVisible.value = false;
 };
 
 // 保存处罚
-const savePunish = () => {
-  if (currentPunishMerchant.value) {
-    console.log('Punish merchant:', currentPunishMerchant.value.merchantName, 'Reason:', punishData.value.punishReason, 'Measure:', punishData.value.punishMeasure);
+const savePunish = async () => {
+  if (!currentPunishMerchant.value) return;
+
+  try {
     if (punishData.value.punishMeasure === 'freeze') {
-      freezeMerchant(currentPunishMerchant.value);
+      const newStatus = currentPunishMerchant.value.status === 3 ? 0 : 3;
+      await updateMerchant({id: currentPunishMerchant.value.id, status: newStatus});
+      ElMessage.success(`商户已${newStatus === 3 ? '冻结' : '解冻'}`);
     } else if (punishData.value.punishMeasure === 'delete') {
-      deleteMerchant(currentPunishMerchant.value);
+      await deleteMerchant({id: currentPunishMerchant.value.id});
+      ElMessage.success('删除成功');
+    } else {
+      ElMessage.success('处罚措施已执行');
     }
+
+    getMerchants();
+    punishDialogVisible.value = false;
+  } catch (error) {
+    ElMessage.error('操作失败');
   }
-  punishDialogVisible.value = false;
 };
+
+getMerchants();
 </script>
 
 <template>
@@ -140,34 +187,36 @@ const savePunish = () => {
       </div>
     </template>
     <el-form :inline="true" class="demo-form-inline">
-      <el-form-item label="商家名称">
-        <el-input placeholder="商家名称" clearable />
+      <el-form-item label="商户名">
+        <el-input placeholder="商户名" clearable v-model="searchUsername"/>
       </el-form-item>
       <el-form-item label="审核状态">
-        <el-select placeholder="请选择审核状态" style="width: 150px;">
-          <el-option label="待审核" value="pending" />
-          <el-option label="已通过" value="approved" />
-          <el-option label="未通过" value="rejected" />
+        <el-select v-model="searchStatus" placeholder="请选择审核状态" style="width: 150px;">
+          <el-option label="待审核" :value="0" />
+          <el-option label="已通过" :value="1" />
+          <el-option label="未通过" :value="2" />
+          <el-option label="冻结" :value="3" />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary">查询</el-button>
+        <el-button type="primary" @click="getMerchants">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table height="500" style="width: 100%">
-      <el-table-column prop="merchantName" label="商家名称" />
-      <el-table-column prop="qualificationFiles" label="资质文件" />
-      <el-table-column prop="storeInfo" label="店铺信息" />
-      <el-table-column prop="storeImages" label="店铺图片" />
-      <el-table-column prop="registrationTime" label="注册时间" />
-      <el-table-column prop="auditStatus" label="审核状态" />
-      <el-table-column label="操作">
+    <el-table :data="merchantList" height="500" style="width: 100%">
+      <el-table-column prop="username" label="商户名称" width="150%"/>
+      <el-table-column prop="phone" label="电话" />
+      <el-table-column prop="email" label="邮箱" width="200%" />
+      <el-table-column prop="createTime" label="注册时间" />
+      <el-table-column label="账号状态">
         <template #default="scope">
-          <el-button type="danger" @click="deleteMerchant(scope.row)">删除</el-button>
+          {{ formatStatus(scope.row.status) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="300%">
+        <template #default="scope">
           <el-button type="primary" @click="editMerchant(scope.row)">编辑</el-button>
-          <el-button type="warning" @click="freezeMerchant(scope.row)">冻结</el-button>
           <el-button type="success" @click="viewAuditDetails(scope.row)">审核详情</el-button>
-          <el-button type="info" @click="punishMerchant(scope.row)">处罚</el-button>
+          <el-button type="warning" @click="punishMerchant(scope.row)">处罚</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -175,6 +224,11 @@ const savePunish = () => {
         :page-sizes="[5, 10, 20, 30, 40]"
         :background="true"
         layout="total, sizes, prev, pager, next, jumper"
+        v-model:current-page="pageNum"
+        v-model:page-size="pageSize"
+        :total="total"
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
     />
   </el-card>
   <el-dialog
@@ -234,7 +288,7 @@ const savePunish = () => {
           </el-select>
         </el-form-item>
         <el-form-item label="审核意见">
-          <el-input v-model="auditData.auditComment" type="textarea" />
+          <el-input v-model="auditData.auditComment" type="text" placeholder="请注意社区规范"/>
         </el-form-item>
       </el-form>
     </span>
@@ -247,14 +301,11 @@ const savePunish = () => {
   </el-dialog>
   <el-dialog
       title="处罚商家"
-      :visible.sync="punishDialogVisible"
+      v-model="punishDialogVisible"
       width="500"
   >
     <span>
       <el-form label-width="auto" style="max-width: 600px">
-        <el-form-item label="处罚原因">
-          <el-input v-model="punishData.punishReason" type="textarea" />
-        </el-form-item>
         <el-form-item label="处罚措施">
           <el-select v-model="punishData.punishMeasure">
             <el-option label="警告" value="warning" />
@@ -262,11 +313,14 @@ const savePunish = () => {
             <el-option label="删除账号" value="delete" />
           </el-select>
         </el-form-item>
+        <el-form-item label="处罚原因">
+          <el-input v-model="punishData.punishReason" type="textarea" />
+        </el-form-item>
       </el-form>
     </span>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="cancelPunish">取消</el-button>
+        <el-button @click="punishDialogVisible = false;">取消</el-button>
         <el-button type="primary" @click="savePunish">确认</el-button>
       </div>
     </template>
