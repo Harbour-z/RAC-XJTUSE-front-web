@@ -35,6 +35,7 @@ const filteredMerchants = computed(() => {
   if (activeCategory.value === 'all') {
     return merchants.value
   }
+  handleSearch()
   return allMerchants.value.filter(merchant => merchant.category === activeCategory.value)
 })
 
