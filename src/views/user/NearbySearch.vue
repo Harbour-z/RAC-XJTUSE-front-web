@@ -4,6 +4,8 @@ import { pageShops } from "@/api/user"
 import {BaiduMap, BmGeolocation, BmNavigation, BmPointCollection} from "vue-baidu-map-3x";
 
 
+const dialogVisible = ref(false)
+const currentShop = ref();
 
 // 处理分页大小改变
 const handleSizeChange = (newSize) => {
@@ -77,7 +79,6 @@ const updateMapPoints = () => {
     lat: shop.latitude,
     data: shop
   }));
-  console.log(points.value);
 };
 
 // 获取子类别
@@ -106,15 +107,10 @@ const loading = ref(false); //加载状态
 
 
 const clickHandler = (e) => {
-  // 获取点击的点数据
-  const pointData = points.value[e.pointIndex]?.data;
-  if (pointData) {
-    // 可以打开弹窗或信息窗口显示详情
-    alert(`点击了：${pointData.merchantName}\n地址：${pointData.address}`);
-  } else {
-    alert(`单击点的坐标为：${e.point.lng}，${e.point.lat}`);
-  }
+  currentShop.value = e.point.data;
+  dialogVisible.value = true
 };
+
 
 // 监听视图模式变化，确保切换到地图时更新标记
 watchEffect(() => {
@@ -184,7 +180,7 @@ watchEffect(() => {
     </el-radio-group>
     <!-- 地图模式 -->
     <div v-if="viewMode === 'map'">
-      <baidu-map key="points.length" class="bm-view" :zoom="20" :center="{ lng: 108.98255910344992, lat: 34.25067879348277 }" :scroll-wheel-zoom="true">
+      <baidu-map key="points.length" class="bm-view" :zoom="20" :center="{ lng: 108.98925910344992, lat: 34.25667879348277 }" :scroll-wheel-zoom="true">
         <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
 
@@ -192,7 +188,7 @@ watchEffect(() => {
             :points="points"
             shape="BMAP_POINT_SHAPE_STAR"
             color="red"
-            size="BMAP_POINT_SIZE_SMALL"
+            size="BMAP_POINT_SIZE_LARGE"
             @click="clickHandler"
         ></bm-point-collection>
       </baidu-map>
@@ -229,6 +225,25 @@ watchEffect(() => {
       </el-row>
     </div>
   </div>
+
+  <el-dialog
+      v-model="dialogVisible"
+      title="店铺信息"
+      width="500"
+  >
+    <div v-if="currentShop">
+      <p><strong>店铺名：</strong>{{ currentShop.merchantName }}</p>
+      <p><strong>地址：</strong>{{ currentShop.address }}</p>
+      <p><strong>评分：</strong>{{ currentShop.avgRating }}</p>
+      <p><strong>标签：</strong>{{ currentShop.tag }}</p>
+
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button type="primary" @click="dialogVisible = false">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <style>
