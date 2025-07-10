@@ -1,3 +1,4 @@
+
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -157,7 +158,7 @@ onMounted(() => {
           <div class="merchant-info">
             <el-avatar :size="50" :src="comment.merchantAvatar" />
             <div class="merchant-details">
-<!--              <h3 class="merchant-name">{{ comment.merchantName }}</h3>-->
+              <!--              <h3 class="merchant-name">{{ comment.merchantName }}</h3>-->
               <div class="comment-time">
                 <span>{{ comment.createdAt }}</span>
                 <el-tag v-if="comment.isEdited" size="small" effect="plain">已编辑</el-tag>
