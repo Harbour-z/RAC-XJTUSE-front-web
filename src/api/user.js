@@ -16,3 +16,6 @@ export const pageUsers = (query) => request.get('/api/userInfo/listPage',{params
 // 提交评价 POST   /api/user/reviews
 // 获取我的评价 GET    /api/user/reviews
 // 个性化 POST   /api/user/<多个api>
+
+//搜索附近所选条件的商家
+export const pageShops = (query) => request.get('/api/shop/listPage',{params:query})

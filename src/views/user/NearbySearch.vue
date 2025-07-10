@@ -1,5 +1,23 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
+import { pageShops } from "@/api/user"
+
+
+
+// 处理分页大小改变
+const handleSizeChange = (newSize) => {
+  pageSize.value = newSize;
+  getShops();
+};
+// 处理当前页码改变
+const handleCurrentChange = (newPage) => {
+  pageNum.value = newPage;
+  getShops();
+};
+
+// 表格数据
+const shopList = ref([]);
+
 
 // 商家类别数据
 const categories = [
@@ -11,16 +29,14 @@ const categories = [
     name: '娱乐',
     subCategories: ['IMAX 厅电影院', '普通厅电影院', '小包厢 KTV', '中包厢 KTV', '大包厢 KTV']
   },
-  {
-    name: '购物',
-    subCategories: []
-  }
 ];
 
 // 搜索条件
+const pageNum = ref(1);
+const pageSize = ref(10);
+const total = ref(0)
 const selectedCategory = ref('');
 const selectedSubCategory = ref('');
-const selectedDistance = ref('');
 const selectedRating = ref('');
 
 // 视图模式
@@ -29,24 +45,20 @@ const viewMode = ref('map');
 // 排序方式
 const sortBy = ref('');
 
-// 模拟商家数据
-const shops = [
-  {
-    name: '川菜馆',
-    rating: 4.5,
-    distance: '2km',
-    tags: ['川菜', '辣']
-  },
-  {
-    name: '法式西餐厅',
-    rating: 4.8,
-    distance: '3km',
-    tags: ['法式西餐', '浪漫']
+// 检索商家数据
+const getShops= () => {
+  const query = {
+    pageNum: pageNum.value,
+    pageSize: pageSize.value,
+    categoryId: selectedSubCategory.value,
+    avgRating: selectedRating.value
   }
-];
 
-// 过滤后的商家数据
-const filteredShops = ref([...shops]);
+  pageShops(query).then(res => {
+    shopList.value = res.data.records
+    total.value = res.data.total
+  })
+}
 
 // 获取子类别
 const getSubCategories = (categoryName) => {
@@ -54,34 +66,16 @@ const getSubCategories = (categoryName) => {
   return category ? category.subCategories : [];
 };
 
-// 搜索商家
-const search = () => {
-  let tempShops = [...shops];
-  if (selectedCategory.value) {
-    // 这里需要根据实际情况筛选
-  }
-  if (selectedSubCategory.value) {
-    // 这里需要根据实际情况筛选
-  }
-  if (selectedDistance.value) {
-    // 这里需要根据实际情况筛选
-  }
-  if (selectedRating.value) {
-    // 这里需要根据实际情况筛选
-  }
-  filteredShops.value = tempShops;
-};
-
 // 排序商家
 const sortShops = () => {
   if (sortBy.value === 'distance') {
-    filteredShops.value.sort((a, b) => {
+    shopList.value.sort((a, b) => {
       const distanceA = parseInt(a.distance.replace('km', ''));
       const distanceB = parseInt(b.distance.replace('km', ''));
       return distanceA - distanceB;
     });
   } else if (sortBy.value === 'rating') {
-    filteredShops.value.sort((a, b) => b.rating - a.rating);
+    shopList.value.sort((a, b) => b.rating - a.rating);
   }
 };
 </script>
@@ -116,13 +110,13 @@ const sortShops = () => {
           </el-select>
         </el-col>
         <!-- 距离筛选 -->
-        <el-col :span="6">
-          <el-select v-model="selectedDistance" placeholder="选择距离" clearable>
-            <el-option label="1km 以内" value="1km"></el-option>
-            <el-option label="5km 以内" value="5km"></el-option>
-            <el-option label="10km 以内" value="10km"></el-option>
-          </el-select>
-        </el-col>
+<!--        <el-col :span="6">-->
+<!--          <el-select v-model="selectedDistance" placeholder="选择距离" clearable>-->
+<!--            <el-option label="1km 以内" value="1km"></el-option>-->
+<!--            <el-option label="5km 以内" value="5km"></el-option>-->
+<!--            <el-option label="10km 以内" value="10km"></el-option>-->
+<!--          </el-select>-->
+<!--        </el-col>-->
         <!-- 评分筛选 -->
         <el-col :span="6">
           <el-select v-model="selectedRating" placeholder="选择评分" clearable>
@@ -134,7 +128,7 @@ const sortShops = () => {
       </el-row>
       <el-row style="margin-top: 10px">
         <el-col :span="6">
-          <el-button @click="search">搜索</el-button>
+          <el-button @click="getShops">搜索</el-button>
         </el-col>
       </el-row>
     </el-card>
@@ -145,7 +139,7 @@ const sortShops = () => {
     </el-radio-group>
     <!-- 地图模式 -->
     <div v-if="viewMode === 'map'">
-      <baidu-map class="bm-view" :zoom="12" :center="{ lng: 116.404, lat: 39.915 }">
+      <baidu-map class="bm-view" :zoom="12" :center="{ lng: 108.98226344637658, lat: 34.250615039407194 }">
         <!-- 这里可以添加地图标记逻辑 -->
         <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
         <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT"></bm-navigation>
@@ -153,16 +147,23 @@ const sortShops = () => {
     </div>
     <!-- 列表模式 -->
     <div v-else>
-      <el-table :data="filteredShops" style="width: 100%">
-        <el-table-column prop="name" label="商家名称"></el-table-column>
-        <el-table-column prop="rating" label="评分"></el-table-column>
-        <el-table-column prop="distance" label="距离"></el-table-column>
-        <el-table-column prop="tags" label="特色标签">
-          <template #default="scope">
-            <el-tag v-for="tag in scope.row.tags" :key="tag">{{ tag }}</el-tag>
-          </template>
-        </el-table-column>
+      <el-table :data="shopList" style="width: 100%">
+        <el-table-column fixed prop="merchantName" label="店铺名" width = "150px" />
+        <el-table-column prop="address" label="地址" />
+        <el-table-column prop="avgRating" label="评分" />
+        <el-table-column prop="tag" label="标签" />
+
       </el-table>
+      <el-pagination
+          :page-sizes="[5, 10, 20, 30, 40]"
+          :background="true"
+          layout="total, sizes, prev, pager, next, jumper"
+          v-model:current-page="pageNum"
+          v-model:page-size="pageSize"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+      />
       <el-row style="margin-top: 10px">
         <el-col :span="6">
           <el-select v-model="sortBy" placeholder="排序方式">
