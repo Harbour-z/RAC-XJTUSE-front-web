@@ -51,6 +51,13 @@ const routes = [
           { path: 'MerchantSetting', component: MerchantSetting } // 商家设置界面
         ]
       },
+        //商铺页面跳转
+      {
+        path: '/merchant/:id',
+        name: 'Merchant',
+        component: () => import('@/views/merchant/MerchantMainPage.vue'),
+        props: true
+      },
 
       // 管理员模块
       {
