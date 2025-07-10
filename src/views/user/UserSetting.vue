@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { ElMessage } from 'element-plus';
+import {h, ref} from 'vue';
+import {ElMessage, ElMessageBox} from 'element-plus';
 import {getCurUser} from "@/api/user";
 import {useUserInfoStore} from "@/stores/userInfo";
 import {useRouter} from "vue-router";
@@ -75,11 +75,23 @@ const submitForm = () => {
 
   formRef.value.validate((valid) => {
     if (valid) {
-      // 处理与后端API的交互逻辑
-      updateUser(submitData).then(res => {getUserInfo()})
-      ElMessage.success('表单提交成功');
+      ElMessageBox({
+        title: '确认编辑',
+        message: h('p', null, [
+          h('span', null, '确定要编辑该用户'+'吗？ '),
+          h('i', { style: 'color: teal' }, '(此操作不可逆)'),
+        ]),
+        showCancelButton: true,
+        confirmButtonText: '修改',
+        cancelButtonText: '取消',
+        type: 'warning',
+      }).then(() => {
+        // 处理与后端API的交互逻辑
+        updateUser(submitData).then(res => {getUserInfo()})
+        ElMessage.success('修改成功');})
+
     } else {
-      ElMessage.error('表单验证失败，请检查输入');
+      ElMessage.error('信息修改失败，请检查输入');
     }
   });
 };

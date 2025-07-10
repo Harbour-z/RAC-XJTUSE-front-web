@@ -63,6 +63,7 @@ const routes = [
             component: MerchantManagement,
           },  // 管理商家
           { path: 'DataAnalysis', component: DataAnalysis }, //数据可视化界面
+
         ]
       }
     ]
