@@ -8,17 +8,27 @@ const userInfoStore = useUserInfoStore();
 
 
 interface Comment {
-  id: number
-  merchantName: string
-  merchantAvatar: string
-  overallRating: number
-  environmentRating: number
-  serviceRating: number
-  tasteRating: number
-  content: string
-  images: string
-  createdAt: string
-  isEdited: boolean
+  content?: string;
+  createdAt?: string;
+  environmentRating?: number;
+  id: number;
+  images?: string[];
+  isEdited?: boolean;
+  merchantAvatar?: string;
+  merchantName?: string;
+  video?:string;
+  overallRating?: number;
+  replies?: Reply[];
+  serviceRating?: number;
+  tasteRating?: number;  // 带问号是可选
+}
+
+interface Reply {
+  id: number;
+  merchantName: string;
+  merchantAvatar: string;
+  content: string;
+  createdAt: string;
 }
 
 const loading = ref(false)
@@ -30,7 +40,7 @@ const editForm = ref({
   serviceRating: 0,
   tasteRating: 0,
   content: '',
-  images: ''
+  images: [] as string[]
 })
 
 const showEditForm = ref(0)
@@ -58,7 +68,7 @@ const fetchUserComments = async () => {
         id: 1,
         merchantName: '美食家餐厅',
         merchantAvatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.fBW6sR4CLav2U8IEFCtB5AAAAA?w=177&h=112&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
-        rating: 5,
+        overallRating: 5,
         environmentRating: 4,
         serviceRating: 5,
         tasteRating: 5,
@@ -83,7 +93,7 @@ const fetchUserComments = async () => {
         id: 2,
         merchantName: '咖啡时光',
         merchantAvatar: 'https://tse2-mm.cn.bing.net/th/id/OIP-C._A_0HkO5gSTQawBVGDSvFwHaEK?w=283&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7',
-        rating: 4,
+        overallRating: 4,
         environmentRating: 5,
         serviceRating: 4,
         tasteRating: 3,
@@ -98,7 +108,7 @@ const fetchUserComments = async () => {
         id: 3,
         merchantName: '快捷便利店',
         merchantAvatar: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.NHlAJWH4dHPMFXkwQWShCwHaHa?w=172&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
-        rating: 3,
+        overallRating: 3,
         environmentRating: 3,
         serviceRating: 3,
         tasteRating: 3,
@@ -140,7 +150,7 @@ const cancelEdit = () => {
     serviceRating: 0,
     tasteRating: 0,
     content: '',
-    images: '',
+    images: [],
   }
 }
 
