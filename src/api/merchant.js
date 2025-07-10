@@ -9,6 +9,8 @@ export const getCurMerchantInfo = (query) => request.get(' /api/merchantInfo/get
 // 更新商家信息 POST    /api/merchants/updateInfo
 export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/updateInfo',query);
 
+export const getMerchantById = (query) => request.get('/api/merchantInfo/getById',{params:query})
+
 export const pageMerchants = (query) => request.get('/api/merchantInfo/listPage',{params:query})
 
 //不知道要不要加商品

@@ -12,6 +12,15 @@ const searchStatus = ref(0);
 const pageNum = ref(1);
 const pageSize = ref(10);
 const total = ref(0)
+
+// 处罚弹窗相关
+const punishDialogVisible = ref(false);
+const currentPunishUser = ref(null);
+const punishData = ref({
+  punishReason: '',
+  punishMeasure: '',
+});
+
 // 处理分页大小改变
 const handleSizeChange = (newSize) => {
   pageSize.value = newSize;
@@ -57,43 +66,6 @@ const editUserData = ref({
 });
 const recordDetails = ref('');
 
-// 删除用户
-const removeUser = (row) => {
-  ElMessageBox({
-    title: '确认删除',
-    message: h('p', null, [
-      h('span', null, '确定要删除用户'+row.username+'吗？ '),
-      h('i', { style: 'color: teal' }, '(此操作不可逆)'),
-    ]),
-    showCancelButton: true,
-    confirmButtonText: '删除',
-    cancelButtonText: '取消',
-    type: 'warning',
-    beforeClose: async (action, instance, done) => {
-      if (action === 'confirm') {
-        instance.confirmButtonLoading = true
-        instance.confirmButtonText = '删除中...'
-        try {
-          const query = {
-            id:row.id
-          }
-          await deleteUser(query)
-          done()
-          ElMessage.success('删除成功')
-          getUsers()
-        } catch (error) {
-          ElMessage.error('删除失败')
-          done()
-        } finally {
-          instance.confirmButtonLoading = false
-        }
-      } else {
-        done()
-      }
-    }
-  })
-}
-
 // 编辑用户
 const editUser = (row) => {
   editUserData.value = JSON.parse(JSON.stringify(row))
@@ -133,23 +105,54 @@ const saveEdit = () => {
         editDialogVisible.value = false;
       });
 };
-// 切换用户状态（冻结/解冻）
-const toggleUserStatus = (row) => {
-  const newStatus = row.status === 0 ? 1 : 0;
-  const actionText = newStatus === 1 ? '冻结' : '解冻';
-  ElMessageBox.confirm(
-      `确定要${actionText}用户 ${row.username} 吗？`,
-      '确认操作',
-      { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }
-  ).then(async () => {
-    try {
-      await updateUser({id: row.id, status: newStatus});
-      ElMessage.success(`用户已${actionText}`);
-      getUsers();
-    } catch (error) {
-      ElMessage.error(`${actionText}用户失败`);
+
+// 处罚用户
+const punishUser = (row) => {
+  punishDialogVisible.value = true;
+  currentPunishUser.value = row;
+  punishData.value = {
+    punishReason: '',
+    punishMeasure: '',
+  };
+};
+
+// 保存处罚
+const savePunish = async () => {
+  if (!currentPunishUser.value) return;
+
+  try {
+    if (punishData.value.punishMeasure === 'freeze') {
+      const newStatus = currentPunishUser.value.status === 1 ? 0 : 1; // 解冻设为0(正常)，冻结设为1
+      await updateUser({
+        id: currentPunishUser.value.id,
+        status: newStatus,
+        auditComment: currentPunishUser.value.status === 1 ?
+            `解冻账号，原因：${punishData.value.punishReason}` :
+            `冻结账号，原因：${punishData.value.punishReason}`
+      });
+
+      const action = currentPunishUser.value.status === 1 ? '解冻' : '冻结';
+      ElMessage.success(`用户已${action}成功`);
+
+    } else if (punishData.value.punishMeasure === 'delete') {
+      // 删除逻辑
+      await deleteUser({id: currentPunishUser.value.id});
+      ElMessage.success('删除成功');
+
+    } else {
+      // 警告逻辑
+      await updateUser({
+        id: currentPunishUser.value.id,
+        auditComment: `警告：${punishData.value.punishReason}`
+      });
+      ElMessage.success('警告已发送');
     }
-  }).catch(() => {});
+    getUsers();
+    punishDialogVisible.value = false;
+    punishData.value = { punishReason: '', punishMeasure: '' }; // 重置表单
+  } catch (error) {
+    ElMessage.error('操作失败');
+  }
 };
 
 // 查看登录记录
@@ -212,24 +215,11 @@ getUsers()
           <img height="50" :src="scope.row.userAvatar" alt="Avatar" />
         </template>
       </el-table-column>
-<!--      <el-table-column label="登录记录">-->
-<!--        <template #default="scope">-->
-<!--          <el-button type="text" @click="viewLoginRecords(scope.row)">查看</el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-<!--      <el-table-column label="收藏记录">-->
-<!--        <template #default="scope">-->
-<!--          <el-button type="text" @click="viewFavoriteRecords(scope.row)">查看</el-button>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
 
       <el-table-column fixed="right" label="操作" width="300">
         <template #default="scope">
-          <el-button type="danger" @click="removeUser(scope.row)">删除</el-button>
           <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>
-          <el-button type="warning" @click="toggleUserStatus(scope.row)">
-            {{ scope.row.status == 0 ? '冻结' : '解冻' }}
-          </el-button>
+          <el-button type="danger" @click="punishUser(scope.row)">处罚</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -244,6 +234,7 @@ getUsers()
         @current-change="handleCurrentChange"
     />
   </el-card>
+
   <el-dialog
       title="用户信息编辑"
       v-model="editDialogVisible"
@@ -269,9 +260,51 @@ getUsers()
       </div>
     </template>
   </el-dialog>
+
+  <!-- 处罚用户对话框 -->
+  <el-dialog
+      title="处罚用户"
+      v-model="punishDialogVisible"
+      width="500"
+  >
+    <span>
+      <el-form label-width="auto" style="max-width: 600px">
+        <el-form-item label="处罚措施">
+          <el-select v-model="punishData.punishMeasure">
+            <el-option label="警告" value="warning" />
+            <el-option
+                :label="currentPunishUser?.status === 1 ? '解冻账号' : '冻结账号'"
+                value="freeze"
+            />
+            <el-option label="删除账号" value="delete" />
+          </el-select>
+        </el-form-item>
+        <el-form-item
+            label="处罚原因"
+            v-if="punishData.punishMeasure === 'warning' || punishData.punishMeasure === 'delete'"
+        >
+          <el-input v-model="punishData.punishReason" type="textarea" />
+        </el-form-item>
+        <el-form-item
+            :label="currentPunishUser?.status === 1 ? '解冻说明' : '冻结原因'"
+            v-else
+        >
+          <el-input v-model="punishData.punishReason" type="textarea" />
+        </el-form-item>
+      </el-form>
+    </span>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="punishDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="savePunish">确认</el-button>
+      </div>
+    </template>
+  </el-dialog>
+
+  <!-- 记录查看对话框 -->
   <el-dialog
       title="详细记录查看"
-      :visible.sync="recordDialogVisible"
+      v-model="recordDialogVisible"
       width="800"
   >
     <span>
