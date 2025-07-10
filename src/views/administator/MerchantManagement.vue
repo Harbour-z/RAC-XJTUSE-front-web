@@ -11,24 +11,6 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-const handleEdit = (row) => {
-  console.log('编辑:', row)
-}
-
-// 删除操作
-const handleDelete = (id) => {
-  ElMessageBox.confirm('确定要删除该商铺吗?', '提示', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    type: 'warning'
-  }).then(() => {
-    console.log('删除ID:', id)
-    ElMessage.success('删除成功')
-  }).catch(() => {
-    ElMessage.info('已取消删除')
-  })
-}
-
 const merchantList = ref([]);
 const shop = ref([]);
 const Qulification = ref([]);
@@ -64,7 +46,6 @@ const formatStatus = (status: number) => {
   }
 };
 
-
 const statusTagType = (status: number) => {
   switch(status) {
     case 0: return 'warning';  // 待审核-黄色
@@ -92,7 +73,6 @@ const getMerchants = () => {
 // 详情弹窗控制
 const detailDialogVisible = ref(false)
 const currentMerchant = ref<any>(null)
-
 // 审核详情对话框是否可见
 const auditDialogVisible = ref(false);
 // 处罚对话框是否可见
@@ -108,34 +88,45 @@ const punishData = ref({
   punishReason: '',
   punishMeasure: '',
 });
-
 // 当前审核的商家
 const currentAuditMerchant = ref(null);
 // 当前处罚的商家
 const currentPunishMerchant = ref(null);
-
+const activeDetailTab = ref('info');
 // 查看详情方法
 const viewDetail = async (row) => {
   try {
+    // 1. 重置UI状态
+    activeDetailTab.value = 'info';
+    detailDialogVisible.value = true;
     currentMerchant.value = JSON.parse(JSON.stringify(row));
 
-    // 并行请求
+    // 2. 强制清空旧数据（即使后续API返回null也会覆盖）
+    shop.value = []; // 设置为空数组
+    Qulification.value = []; // 设置为空数组
+
+    // 3. 执行请求并强制覆盖数据
     const [shopRes, qualRes] = await Promise.all([
       getShopByName({ id: row.id, username: row.username }),
       getQulificationById({ merchantId: row.id })
     ]);
 
-    shop.value = Array.isArray(shopRes.data) ? shopRes.data : [shopRes.data];
-    Qulification.value = Array.isArray(qualRes.data) ? qualRes.data : [qualRes.data];
+    // 4. 无条件覆盖，即使返回null
+    shop.value = shopRes.data ?
+        (Array.isArray(shopRes.data) ? shopRes.data : [shopRes.data]) :
+        [];
 
-    console.log('商铺数据:', shop.value);
-    console.log('资质数据:', Qulification.value);
+    Qulification.value = qualRes.data ?
+        (Array.isArray(qualRes.data) ? qualRes.data : [qualRes.data]) :
+        [];
 
-    detailDialogVisible.value = true;
+    console.log('当前商铺数据:', shop.value);
+    console.log('当前资质数据:', Qulification.value);
+
   } catch (error) {
     console.error('获取详情失败:', error);
     ElMessage.error('获取详情失败');
-    // 确保设置为空数组而不是null/undefined
+    // 确保最终状态是明确的空数组
     shop.value = [];
     Qulification.value = [];
   }
@@ -317,8 +308,8 @@ getMerchants();
       title="商户详情与设置"
       width="70%"
   >
-    <el-tabs>
-      <el-tab-pane label="基本信息">
+    <el-tabs v-model="activeDetailTab">
+      <el-tab-pane label="基本信息" name="info">
         <el-form label-width="120px">
           <el-row :gutter="20">
             <el-col :span="8">
@@ -359,9 +350,8 @@ getMerchants();
         </el-form>
       </el-tab-pane>
 
-      <el-tab-pane label="商铺">
-        <el-table :data="shop" style="width: 100%" border v-if="shop.length > 0">
-          <!-- 固定列定义（推荐方式） -->
+      <el-tab-pane label="商铺" name="shop" lazy>
+        <el-table :data="shop" style="width: 100%" border v-if="shop && shop.length > 0">
           <el-table-column prop="id" label="ID" width="80" align="center" />
           <el-table-column prop="username" label="用户名" width="120" />
           <el-table-column prop="merchantName" label="商户名称" width="150" />
@@ -389,7 +379,7 @@ getMerchants();
         <el-empty description="暂无商铺数据" v-else />
       </el-tab-pane>
 
-      <el-tab-pane label="资质信息">
+      <el-tab-pane label="资质信息" name="qualification" lazy>
         <el-table :data="Qulification" style="width: 100%" border v-if="Qulification && Qulification.length > 0">
           <el-table-column prop="id" label="ID" width="80" align="center" />
           <el-table-column prop="merchantId" label="商户ID" width="100" align="center" />
