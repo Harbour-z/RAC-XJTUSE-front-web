@@ -1,46 +1,47 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import type { FormInstance } from 'element-plus'
+import {pageComments, updateComment , deleteCurComment} from "@/api/user";
+import {useUserInfoStore} from "@/stores/userInfo";
+const userInfoStore = useUserInfoStore();
+
+
 
 interface Comment {
   id: number
   merchantName: string
   merchantAvatar: string
-  rating: number
+  overallRating: number
   environmentRating: number
   serviceRating: number
   tasteRating: number
   content: string
-  images: string[]
-  video?: string
+  images: string
   createdAt: string
-  replies: Reply[]
   isEdited: boolean
-}
-
-interface Reply {
-  id: number
-  merchantName: string
-  merchantAvatar: string
-  content: string
-  createdAt: string
 }
 
 const loading = ref(false)
 const comments = ref<Comment[]>([])
 const editForm = ref({
   id: 0,
-  rating: 0,
+  overallRating: 0,
   environmentRating: 0,
   serviceRating: 0,
   tasteRating: 0,
   content: '',
-  images: [] as string[],
-  video: ''
+  images: ''
 })
-const editFormRef = ref<FormInstance | null>(null)
+
 const showEditForm = ref(0)
+
+const query = {
+  userId:userInfoStore.userInfo.id,
+}
+
+pageComments(query).then(response => {
+  comments.value = response.data.records
+})
 
 // 图片预览对话框
 const dialogImageUrl = ref('')
@@ -119,13 +120,12 @@ const fetchUserComments = async () => {
 const initEditForm = (comment: Comment) => {
   editForm.value = {
     id: comment.id,
-    rating: comment.rating,
+    overallRating: comment.overallRating,
     environmentRating: comment.environmentRating,
     serviceRating: comment.serviceRating,
     tasteRating: comment.tasteRating,
     content: comment.content,
-    images: [...comment.images],
-    video: comment.video || ''
+    images: comment.images,
   }
   showEditForm.value = comment.id
 }
@@ -135,40 +135,21 @@ const cancelEdit = () => {
   showEditForm.value = 0
   editForm.value = {
     id: 0,
-    rating: 0,
+    overallRating: 0,
     environmentRating: 0,
     serviceRating: 0,
     tasteRating: 0,
     content: '',
-    images: [],
-    video: ''
+    images: '',
   }
 }
 
 // 提交编辑
 const submitEdit = () => {
-  if (editFormRef.value) {
-    editFormRef.value.validate((valid) => {
-      if (valid) {
-        const index = comments.value.findIndex(c => c.id === editForm.value.id)
-        if (index !== -1) {
-          comments.value[index] = {
-            ...comments.value[index],
-            rating: editForm.value.rating,
-            environmentRating: editForm.value.environmentRating,
-            serviceRating: editForm.value.serviceRating,
-            tasteRating: editForm.value.tasteRating,
-            content: editForm.value.content,
-            images: editForm.value.images,
-            video: editForm.value.video,
-            isEdited: true
-          }
-          ElMessage.success('评论修改成功')
-          cancelEdit()
-        }
-      }
-    })
-  }
+  updateComment(editForm.value).then(res => {
+    ElMessage.success('评论修改成功')
+    cancelEdit()
+  })
 }
 
 // 删除评论确认
@@ -185,7 +166,13 @@ const confirmDelete = (id: number) => {
 // 删除评论
 const deleteComment = (id: number) => {
   comments.value = comments.value.filter(c => c.id !== id)
-  ElMessage.success('评论删除成功')
+  const query = {
+    id: id
+  }
+  deleteCurComment(query).then(response => {
+    ElMessage.success('评论删除成功')
+  })
+
 }
 
 // 图片预览
@@ -204,7 +191,7 @@ onMounted(() => {
     <el-card shadow="never" class="luxury-card">
       <template #header>
         <div class="card-header">
-          <h1><i class="el-icon-notebook-2"></i> 我的评论</h1>
+          <h1><i class="el-icon-notebook-2"></i>我的评论</h1>
           <div class="header-actions">
             <el-tag type="info" size="large">
               <i class="el-icon-collection"></i> 共 {{ comments.length }} 条评论
@@ -226,7 +213,7 @@ onMounted(() => {
           <div class="merchant-info">
             <el-avatar :size="50" :src="comment.merchantAvatar" />
             <div class="merchant-details">
-              <h3 class="merchant-name">{{ comment.merchantName }}</h3>
+<!--              <h3 class="merchant-name">{{ comment.merchantName }}</h3>-->
               <div class="comment-time">
                 <span>{{ comment.createdAt }}</span>
                 <el-tag v-if="comment.isEdited" size="small" effect="plain">已编辑</el-tag>
@@ -237,7 +224,7 @@ onMounted(() => {
           <div class="rating-section">
             <div class="rating-item">
               <span class="rating-label">总体评分:</span>
-              <el-rate v-model="comment.rating" disabled show-score :score-template="`${comment.rating}分`" />
+              <el-rate v-model="comment.overallRating" disabled />
             </div>
             <div class="rating-item">
               <span class="rating-label">环境评分:</span>
@@ -256,7 +243,7 @@ onMounted(() => {
           <div class="comment-content">
             <p>{{ comment.content }}</p>
 
-            <div v-if="comment.images.length > 0" class="media-section">
+            <div class="media-section">
               <el-image
                   v-for="(image, index) in comment.images"
                   :key="index"
@@ -268,9 +255,6 @@ onMounted(() => {
               />
             </div>
 
-            <div v-if="comment.video" class="media-section">
-              <video controls :src="comment.video" class="comment-video"></video>
-            </div>
           </div>
 
           <div class="comment-actions">
@@ -286,7 +270,7 @@ onMounted(() => {
             <div v-if="showEditForm === comment.id" class="edit-form">
               <el-form :model="editForm" ref="editFormRef" label-width="100px">
                 <el-form-item label="总体评分" prop="rating" required>
-                  <el-rate v-model="editForm.rating" :max="5" />
+                  <el-rate v-model="editForm.overallRating" :max="5" />
                 </el-form-item>
                 <el-form-item label="环境评分" prop="environmentRating" required>
                   <el-rate v-model="editForm.environmentRating" :max="5" />
@@ -307,24 +291,6 @@ onMounted(() => {
               </el-form>
             </div>
           </el-collapse-transition>
-
-          <div v-if="comment.replies.length > 0" class="replies-section">
-            <div class="replies-title">
-              <i class="el-icon-chat-line-square"></i> 商家回复
-            </div>
-            <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
-              <div class="reply-header">
-                <el-avatar :size="36" :src="reply.merchantAvatar" />
-                <div class="reply-info">
-                  <span class="reply-merchant">{{ reply.merchantName }}</span>
-                  <span class="reply-time">{{ reply.createdAt }}</span>
-                </div>
-              </div>
-              <div class="reply-content">
-                <p>{{ reply.content }}</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
