@@ -8,17 +8,27 @@ const userInfoStore = useUserInfoStore();
 
 
 interface Comment {
-  id: number
-  merchantName: string
-  merchantAvatar: string
-  overallRating: number
-  environmentRating: number
-  serviceRating: number
-  tasteRating: number
-  content: string
-  images: string
-  createdAt: string
-  isEdited: boolean
+  content?: string;
+  createdAt?: string;
+  environmentRating?: number;
+  id: number;
+  images?: string[];
+  isEdited?: boolean;
+  merchantAvatar?: string;
+  merchantName?: string;
+  video?:string;
+  overallRating?: number;
+  replies?: Reply[];
+  serviceRating?: number;
+  tasteRating?: number;  // 带问号是可选
+}
+
+interface Reply {
+  id: number;
+  merchantName: string;
+  merchantAvatar: string;
+  content: string;
+  createdAt: string;
 }
 
 const loading = ref(false)
@@ -30,7 +40,7 @@ const editForm = ref({
   serviceRating: 0,
   tasteRating: 0,
   content: '',
-  images: ''
+  images: [] as string[]
 })
 
 const showEditForm = ref(0)
@@ -53,6 +63,62 @@ const fetchUserComments = async () => {
   try {
     // 模拟API请求
     await new Promise(resolve => setTimeout(resolve, 800))
+    comments.value = [
+      {
+        id: 1,
+        merchantName: '美食家餐厅',
+        merchantAvatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.fBW6sR4CLav2U8IEFCtB5AAAAA?w=177&h=112&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+        overallRating: 5,
+        environmentRating: 4,
+        serviceRating: 5,
+        tasteRating: 5,
+        content: '这家餐厅的菜品非常棒，尤其是招牌红烧肉，肥而不腻，入口即化！',
+        images: [
+          'https://tse4-mm.cn.bing.net/th/id/OIP-C.1w3nNiyBmscnxm3qZspasAAAAA?w=123&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+          'https://tse3-mm.cn.bing.net/th/id/OIP-C.yK2Wm5-UBwMwaFcP4ATq2QHaGy?w=205&h=188&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3'
+        ],
+        createdAt: '2023-06-15 18:30:45',
+        replies: [
+          {
+            id: 1,
+            merchantName: '美食家餐厅',
+            merchantAvatar: 'https://tse3-mm.cn.bing.net/th/id/OIP-C.fBW6sR4CLav2U8IEFCtB5AAAAA?w=177&h=112&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+            content: '感谢您的支持，我们会继续努力提供更好的菜品和服务！',
+            createdAt: '2023-06-15 19:15:20'
+          }
+        ],
+        isEdited: false
+      },
+      {
+        id: 2,
+        merchantName: '咖啡时光',
+        merchantAvatar: 'https://tse2-mm.cn.bing.net/th/id/OIP-C._A_0HkO5gSTQawBVGDSvFwHaEK?w=283&h=180&c=7&r=0&o=5&dpr=1.8&pid=1.7',
+        overallRating: 4,
+        environmentRating: 5,
+        serviceRating: 4,
+        tasteRating: 3,
+        content: '环境非常舒适，适合工作学习，但咖啡味道还可以再提升',
+        images: [],
+        video: 'https://example.com/video.mp4',
+        createdAt: '2023-06-10 14:20:30',
+        replies: [],
+        isEdited: true
+      },
+      {
+        id: 3,
+        merchantName: '快捷便利店',
+        merchantAvatar: 'https://tse1-mm.cn.bing.net/th/id/OIP-C.NHlAJWH4dHPMFXkwQWShCwHaHa?w=172&h=180&c=7&r=0&o=7&dpr=1.8&pid=1.7&rm=3',
+        overallRating: 3,
+        environmentRating: 3,
+        serviceRating: 3,
+        tasteRating: 3,
+        content: '商品种类齐全，但价格比周边便利店稍贵',
+        images: [],
+        createdAt: '2023-06-05 09:10:15',
+        replies: [],
+        isEdited: false
+      }
+    ]
   } catch (error) {
     ElMessage.error('获取评论历史失败')
   } finally {
@@ -85,7 +151,7 @@ const cancelEdit = () => {
     serviceRating: 0,
     tasteRating: 0,
     content: '',
-    images: '',
+    images: [],
   }
 }
 
