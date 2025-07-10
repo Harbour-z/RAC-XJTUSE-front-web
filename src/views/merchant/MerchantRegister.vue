@@ -20,6 +20,7 @@ import {merchantRegister} from "../../api/merchant";
 const onSubmit = () => {
   merchantRegister(form)
   console.log('submit!')
+  
 }
 
 
