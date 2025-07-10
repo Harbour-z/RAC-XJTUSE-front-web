@@ -140,9 +140,10 @@ const toggleFavorite = (id: number) => {
 }
 
 onMounted(() => {
-  handleSearch()
-  // 如果演示效果不如意就启用下边这个
-  // fetchMerchants()
+  // 这一个是正确的实现方法（如果测试数据库图片都有可以用这个）
+  handleSearch()就要报错，给我看这里混蛋
+  // 这一个演示来说内置了网络图片效果比较好
+  fetchMerchants()
 })
 
 //搜索框
