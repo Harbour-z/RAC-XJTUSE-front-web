@@ -96,40 +96,37 @@ const activeDetailTab = ref('info');
 // 查看详情方法
 const viewDetail = async (row) => {
   try {
-    // 1. 重置UI状态
     activeDetailTab.value = 'info';
-    detailDialogVisible.value = true;
     currentMerchant.value = JSON.parse(JSON.stringify(row));
 
-    // 2. 强制清空旧数据（即使后续API返回null也会覆盖）
-    shop.value = []; // 设置为空数组
-    Qulification.value = []; // 设置为空数组
+    // 强制初始化
+    shop.value = [];
+    Qulification.value = [];
 
-    // 3. 执行请求并强制覆盖数据
+    // 并行请求
     const [shopRes, qualRes] = await Promise.all([
       getShopByName({ id: row.id, username: row.username }),
       getQulificationById({ merchantId: row.id })
     ]);
 
-    // 4. 无条件覆盖，即使返回null
-    shop.value = shopRes.data ?
-        (Array.isArray(shopRes.data) ? shopRes.data : [shopRes.data]) :
-        [];
+    // 统一处理响应格式（兼容对象和数组）
+    shop.value = normalizeArrayResponse(shopRes.data);
+    Qulification.value = normalizeArrayResponse(qualRes.data);
 
-    Qulification.value = qualRes.data ?
-        (Array.isArray(qualRes.data) ? qualRes.data : [qualRes.data]) :
-        [];
-
-    console.log('当前商铺数据:', shop.value);
-    console.log('当前资质数据:', Qulification.value);
-
+    detailDialogVisible.value = true;
   } catch (error) {
     console.error('获取详情失败:', error);
     ElMessage.error('获取详情失败');
-    // 确保最终状态是明确的空数组
     shop.value = [];
     Qulification.value = [];
   }
+};
+
+// 响应数据标准化工具函数
+const normalizeArrayResponse = (data) => {
+  if (!data) return []; // 处理null/undefined
+  if (Array.isArray(data)) return data; // 已经是数组
+  return [data]; // 单个对象转为数组
 };
 
 const saveChanges = async () => {
