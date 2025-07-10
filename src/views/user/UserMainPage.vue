@@ -31,13 +31,13 @@ const categories = [
 ]
 
 // 计算属性：根据当前选中的分类筛选商家
-const filteredMerchants = computed(() => {
-  if (activeCategory.value === 'all') {
-    return merchants.value
-  }
-  handleSearch()
-  return allMerchants.value.filter(merchant => merchant.category === activeCategory.value)
-})
+// const filteredMerchants = computed(() => {
+//   if (activeCategory.value === 'all') {
+//     return merchants.value
+//   }
+//   handleSearch()
+//   return allMerchants.value.filter(merchant => merchant.category === activeCategory.value)
+// })
 
 const fetchMerchants = async () => {
   loading.value = true
@@ -154,30 +154,25 @@ function getRandomItems(array, n) {
   return [...array].sort(() => 0.5 - Math.random()).slice(0, n);
 }
 const handleSearch = () => {
-  console.log('搜索关键词:', searchQuery.value)
-  // 这里添加搜索逻辑，比如过滤商家列表
-  getMerchantInfo( searchQuery.value )
+  getMerchantInfo(searchQuery.value, activeCategory.value)
       .then(response => {
-        // 处理返回的商家数据
         const mappedMerchants = response.data.records.map(shop => ({
           id: shop.id,
-          name: shop.merchantName,      // 后端字段可能是 merchantName
-          avatar: shop.avatar || '',  // 默认头像
-          cover: shop.cover || '', // 默认封面
-          rating: shop.avgRating || 0,   // 后端可能是 avgRating
-          category:  String(shop.categoryId)|| 'all', // 后端可能是 categoryId
-          distance: shop.distance || '1.2km', // 默认距离
-          deliveryTime: shop.deliveryTime || '30分钟', // 默认时间
-          promotion: shop.promotion || '暑期优惠', // 促销信息
+          name: shop.merchantName,
+          avatar: shop.avatar || '',
+          cover: shop.cover || '',
+          rating: shop.avgRating || 0,
+          category: String(shop.categoryId) || 'all',
+          distance: shop.distance || '1.2km',
+          deliveryTime: shop.deliveryTime || '30分钟',
+          promotion: shop.promotion || '暑期优惠',
           description: shop.description || '暂无描述',
-          isFavorite: false              // 默认未收藏
+          isFavorite: false
         }));
 
-        // 2. 随机选取最多6条
+        // 随机选取最多6条
         const randomMerchants = getRandomItems(mappedMerchants, 6);
-        // 3. 更新到 merchants 和 allMerchants
         merchants.value = randomMerchants;
-        allMerchants.value = mappedMerchants;
       })
       .catch(error => {
         console.error('搜索失败:', error);
@@ -212,29 +207,28 @@ const handleSearch = () => {
       <div class="categories">
         <el-scrollbar>
           <div class="category-list">
-            <el-tag
-                v-for="category in categories"
-                :key="category.value"
-                :type="activeCategory === category.value ? 'primary' : 'info'"
-                size="large"
-                effect="plain"
-                @click="activeCategory= category.value"
-                class="category-tag"
-            >
-              {{ category.label }}
-            </el-tag>
+            <el-radio-group v-model="activeCategory" @change="handleSearch">
+              <el-radio
+                  v-for="category in categories"
+                  :key="category.value"
+                  :label="category.label"
+                  :value="category.value"
+                  size="large"
+                  class="category-tag"
+              />
+            </el-radio-group>
           </div>
         </el-scrollbar>
       </div>
 
       <div class="merchant-list" v-loading="loading">
-        <div v-if="filteredMerchants.length === 0 && !loading" class="empty">
+        <div v-if="merchants.length === 0 && !loading" class="empty">
           <img src="@/assets/images/empty-shop.png" alt="暂无商家" class="empty-image">
           <p class="empty-text">附近暂无商家</p>
         </div>
 
 
-        <div v-for="merchant in filteredMerchants" :key="merchant.id" class="merchant-card">
+        <div v-for="merchant in merchants" :key="merchant.id" class="merchant-card">
           <div class="merchant-cover" @click="$router.push(`/merchant/${merchant.id}`)">
             <el-image :src="merchant.cover" class="cover-image" fit="cover" />
             <div class="cover-overlay">
