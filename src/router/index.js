@@ -60,6 +60,7 @@ const routes = [
           { path: 'UserManagement', component: UserManagement}, // 用户管理面板
           { path: 'MerchantManagement', component: MerchantManagement }, // 管理商家
           { path: 'DataAnalysis', component: DataAnalysis }, //数据可视化界面
+
         ]
       }
     ]

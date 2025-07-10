@@ -61,14 +61,15 @@ const auditDialogVisible = ref(false);
 const punishDialogVisible = ref(false);
 // 编辑的商家数据
 const editMerchantData = ref({
-  merchantName: '',
-  qualificationFiles: '',
-  storeInfo: '',
-  storeImages: '',
+  id: '',
+  username: '',
+  phone: '',
+  email: ''
 });
+
 // 审核数据
 const auditData = ref({
-  auditStatus: 'pending',
+  auditStatus: 0,
   auditComment: '',
 });
 // 处罚数据
@@ -76,6 +77,7 @@ const punishData = ref({
   punishReason: '',
   punishMeasure: '',
 });
+
 // 当前审核的商家
 const currentAuditMerchant = ref(null);
 // 当前处罚的商家
@@ -83,7 +85,12 @@ const currentPunishMerchant = ref(null);
 
 // 编辑商家
 const editMerchant = (row) => {
-  editMerchantData.value = { ...row };
+  editMerchantData.value = {
+    id: row.id,
+    username: row.username,
+    phone: row.phone,
+    email: row.email
+  };
   editDialogVisible.value = true;
 };
 
@@ -91,8 +98,8 @@ const editMerchant = (row) => {
 const viewAuditDetails = (row) => {
   currentAuditMerchant.value = row;
   auditData.value = {
-    auditStatus: row.auditStatus,
-    auditComment: '',
+    auditStatus: row.status,
+    auditComment: row.auditComment || '',
   };
   auditDialogVisible.value = true;
 };
@@ -101,48 +108,47 @@ const viewAuditDetails = (row) => {
 const cancelEdit = () => {
   editDialogVisible.value = false;
 };
-
 // 保存编辑
-const saveEdit = () => {
-  // 实现保存编辑逻辑
-  console.log('Save edit:', editMerchantData.value);
-  editDialogVisible.value = false;
-};
+const saveEdit = async () => {
+  try {
+    // 只提交允许修改的字段
+    const submitData = {
+      id: editMerchantData.value.id,
+      username: editMerchantData.value.username,
+      phone: editMerchantData.value.phone,
+      email: editMerchantData.value.email
+    };
 
+    await updateMerchant(submitData);
+    ElMessage.success('商户信息更新成功');
+    getMerchants();
+    editDialogVisible.value = false;
+  } catch (error) {
+    ElMessage.error('更新商户信息失败');
+  }
+};
 // 取消审核
 const cancelAudit = () => {
   auditDialogVisible.value = false;
 };
-
 // 保存审核
-const saveAudit = () => {
-  // 实现保存审核逻辑
-  if (currentAuditMerchant.value) {
-    currentAuditMerchant.value.auditStatus = auditData.value.auditStatus;
-    if (auditData.value.auditStatus === 'rejected') {
-      // 通知商家审核不通过及原因
-      console.log('Notify merchant:', currentAuditMerchant.value.merchantName, 'Rejected reason:', auditData.value.auditComment);
-    } else if (auditData.value.auditStatus === 'approved') {
-      // 允许用户评论商家
-      console.log('Allow users to comment on merchant:', currentAuditMerchant.value.merchantName);
-    }
+const saveAudit = async () => {
+  if (!currentAuditMerchant.value) return;
+
+  try {
+    await updateMerchant({
+      id: currentAuditMerchant.value.id,
+      status: auditData.value.auditStatus,
+      auditComment: auditData.value.auditComment
+    });
+
+    ElMessage.success('审核状态已更新');
+    getMerchants();
+    auditDialogVisible.value = false;
+  } catch (error) {
+    ElMessage.error('更新审核状态失败');
   }
-  console.log('Save audit:', auditData.value);
-  auditDialogVisible.value = false;
 };
-
-// 处理文件上传成功
-const handleFileUploadSuccess = (response, file, fileList) => {
-  // 实现文件上传成功逻辑
-  console.log('File upload success:', response);
-};
-
-// 处理图片上传成功
-const handleImageUploadSuccess = (response, file, fileList) => {
-  // 实现图片上传成功逻辑
-  console.log('Image upload success:', response);
-};
-
 // 处罚商家
 const punishMerchant = (row) => {
   punishDialogVisible.value = true;
@@ -152,7 +158,6 @@ const punishMerchant = (row) => {
     punishMeasure: '',
   };
 };
-
 // 保存处罚
 const savePunish = async () => {
   if (!currentPunishMerchant.value) return;
@@ -174,6 +179,15 @@ const savePunish = async () => {
   } catch (error) {
     ElMessage.error('操作失败');
   }
+};
+
+// 处理文件上传成功
+const handleFileUploadSuccess = (response, file, fileList) => {
+  console.log('File upload success:', response);
+};
+// 处理图片上传成功
+const handleImageUploadSuccess = (response, file, fileList) => {
+  console.log('Image upload success:', response);
 };
 
 getMerchants();
@@ -233,39 +247,23 @@ getMerchants();
   </el-card>
   <el-dialog
       title="商家信息编辑"
-      :visible.sync="editDialogVisible"
+      v-model="editDialogVisible"
       width="500"
   >
-    <span>
-      <el-form label-width="auto" style="max-width: 600px">
-        <el-form-item label="商家名称">
-          <el-input v-model="editMerchantData.merchantName" />
-        </el-form-item>
-        <el-form-item label="资质文件">
-          <el-upload
-              class="file-uploader"
-              action="/api/file/upload"
-              :show-file-list="false"
-              :on-success="handleFileUploadSuccess"
-          >
-            <el-icon class="file-uploader-icon"><Plus /></el-icon>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="店铺信息">
-          <el-input v-model="editMerchantData.storeInfo" type="textarea" />
-        </el-form-item>
-        <el-form-item label="店铺图片">
-          <el-upload
-              class="image-uploader"
-              action="/api/file/upload"
-              :show-file-list="false"
-              :on-success="handleImageUploadSuccess"
-          >
-            <el-icon class="image-uploader-icon"><Plus /></el-icon>
-          </el-upload>
-        </el-form-item>
-      </el-form>
-    </span>
+    <el-form label-width="100px" style="max-width: 500px">
+      <el-form-item label="商户ID" prop="id">
+        <el-input v-model="editMerchantData.id" disabled />
+      </el-form-item>
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="editMerchantData.username" />
+      </el-form-item>
+      <el-form-item label="联系电话" prop="phone">
+        <el-input v-model="editMerchantData.phone" />
+      </el-form-item>
+      <el-form-item label="电子邮箱" prop="email">
+        <el-input v-model="editMerchantData.email" />
+      </el-form-item>
+    </el-form>
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="cancelEdit">取消</el-button>
@@ -275,20 +273,44 @@ getMerchants();
   </el-dialog>
   <el-dialog
       title="审核详情"
-      :visible.sync="auditDialogVisible"
+      v-model="auditDialogVisible"
       width="500"
   >
     <span>
       <el-form label-width="auto" style="max-width: 600px">
+        <el-form-item label="当前状态">
+          <el-tag :type="formatStatus(currentAuditMerchant?.status)">
+            {{ formatStatus(currentAuditMerchant?.status) }}
+          </el-tag>
+        </el-form-item>
         <el-form-item label="审核状态">
           <el-select v-model="auditData.auditStatus">
-            <el-option label="待审核" value="pending" />
-            <el-option label="已通过" value="approved" />
-            <el-option label="未通过" value="rejected" />
+            <el-option label="待审核" :value="0" />
+            <el-option label="已通过" :value="1" />
+            <el-option label="未通过" :value="2" />
           </el-select>
         </el-form-item>
-        <el-form-item label="审核意见">
-          <el-input v-model="auditData.auditComment" type="text" placeholder="请注意社区规范"/>
+        <el-form-item
+            label="审核意见"
+            v-if="auditData.auditStatus === 2"
+        >
+          <el-input
+              v-model="auditData.auditComment"
+              type="textarea"
+              placeholder="请输入未通过原因"
+              :rows="3"
+          />
+        </el-form-item>
+        <el-form-item
+            label="备注信息"
+            v-else
+        >
+          <el-input
+              v-model="auditData.auditComment"
+              type="textarea"
+              placeholder="可输入备注信息"
+              :rows="3"
+          />
         </el-form-item>
       </el-form>
     </span>
