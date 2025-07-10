@@ -169,8 +169,8 @@ onMounted(() => {
             <input v-model="loginForm.password" type="password" placeholder="Password" required />
           </div>
           <el-radio-group v-model="loginForm.role">
-            <el-radio value="用户">用户</el-radio>
-            <el-radio value="商家">商家</el-radio>
+            <el-radio value="用户">用 户</el-radio>
+            <el-radio value="商家">商 家</el-radio>
             <el-radio value="管理员">管理员</el-radio>
           </el-radio-group>
           <input type="submit" value="Login" class="btn solid" />

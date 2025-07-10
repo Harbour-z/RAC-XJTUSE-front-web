@@ -283,7 +283,7 @@ getMerchants();
       <el-table-column label="操作" width="300%">
         <template #default="scope">
           <el-button type="primary" @click="viewDetail(scope.row)">详情</el-button>
-          <el-button type="success" @click="viewAuditDetails(scope.row)">审核</el-button>
+          <el-button type="warning" @click="viewAuditDetails(scope.row)">审核</el-button>
           <el-button type="danger" @click="punishMerchant(scope.row)">处罚管理</el-button>
         </template>
       </el-table-column>
@@ -410,18 +410,23 @@ getMerchants();
               <span v-else>-</span>
             </template>
           </el-table-column>
-
-          <el-table-column label="其他许可" width="150">
+          <el-table-column label="其他许可" width="300">
             <template #default="{row}">
-              <el-image
-                  v-if="row.otherPermit"
-                  style="width: 100px; height: 60px"
-                  :src="row.otherPermit"
-                  :preview-src-list="[row.otherPermit]"
-                  fit="cover"
-                  hide-on-click-modal
-                  preview-teleported
-              />
+              <div
+                  v-if="row.otherPermit && JSON.parse(row.otherPermit).length"
+                  style="display: flex; flex-wrap: wrap; gap: 5px;"
+              >
+                <el-image
+                    v-for="(img, index) in JSON.parse(row.otherPermit)"
+                    :key="index"
+                    style="width: 60px; height: 45px;"
+                    :src="img"
+                    :preview-src-list="JSON.parse(row.otherPermit)"
+                    fit="cover"
+                    hide-on-click-modal
+                    preview-teleported
+                />
+              </div>
               <span v-else>-</span>
             </template>
           </el-table-column>
