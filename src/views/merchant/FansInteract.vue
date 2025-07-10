@@ -54,7 +54,7 @@ const fetchData = () => {
         type: 'image',
         content: '我们即将推出夏日限定甜品系列，敬请期待！',
         media: [
-          ''
+          'https://tse2-mm.cn.bing.net/th/id/OIP-C.fHWDMkoQrzAhRf5hrd0hoAHaDI?w=344&h=148&c=7&r=0&o=5&dpr=1.8&pid=1.7'
         ],
         date: '2023-05-10',
         views: 256,
@@ -66,7 +66,7 @@ const fetchData = () => {
         title: '店铺故事：我们的初心',
         type: 'video',
         content: '讲述我们开店以来的心路历程',
-        media: ['https://example.com/video.mp4'],
+        media: [''],
         date: '2023-05-05',
         views: 189,
         likes: 95,
