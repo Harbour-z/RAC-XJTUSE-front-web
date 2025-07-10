@@ -13,9 +13,11 @@ export const getCurMerchantInfo = (query) => request.get(' /api/merchantInfo/get
 // 更新商家信息 POST    /api/merchants/updateInfo
 export const updateMerchantInfo = (query) => request.post('/api/merchantInfo/updateInfo',query);
 
-export const getMerchantById = (query) => request.get('/api/merchantInfo/getById',{params:query})
+export const getShopByName = (query) => request.post('/api/shop/getByName',query)
 
 export const pageMerchants = (query) => request.get('/api/merchantInfo/listPage',{params:query})
+
+export const getQulificationById = (query1) => request.post('/api/merchantQulification/getByMerchantId',query1)
 
 //不知道要不要加商品
 // // 获取商品列表 GET    /api/merchants/getProducts

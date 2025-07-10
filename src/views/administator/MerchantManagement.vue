@@ -1,13 +1,37 @@
 <script lang="ts" setup>
-import {h, ref} from 'vue';
+import {ref} from 'vue';
 import {ElMessage, ElMessageBox} from "element-plus";
 import {
   updateMerchant,deleteMerchant
 } from '../../api/admin'
 import { Plus } from "@element-plus/icons-vue"
-import {pageMerchants} from '../../api/merchant'
+import {pageMerchants,getShopByName,getQulificationById} from '../../api/merchant'
+const formatDate = (dateString) => {
+  if (!dateString) return '-'
+  return new Date(dateString).toLocaleString()
+}
+
+const handleEdit = (row) => {
+  console.log('编辑:', row)
+}
+
+// 删除操作
+const handleDelete = (id) => {
+  ElMessageBox.confirm('确定要删除该商铺吗?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    console.log('删除ID:', id)
+    ElMessage.success('删除成功')
+  }).catch(() => {
+    ElMessage.info('已取消删除')
+  })
+}
 
 const merchantList = ref([]);
+const shop = ref([]);
+const Qulification = ref([]);
 const searchUsername = ref('');
 const searchStatus = ref(0);
 const pageNum = ref(1);
@@ -39,6 +63,7 @@ const formatStatus = (status: number) => {
       return '未知状态';
   }
 };
+
 
 const statusTagType = (status: number) => {
   switch(status) {
@@ -89,32 +114,65 @@ const currentAuditMerchant = ref(null);
 // 当前处罚的商家
 const currentPunishMerchant = ref(null);
 
-// 查看详情方法（合并了编辑功能）
-const viewDetail = (row: any) => {
-  currentMerchant.value = {...row} // 使用拷贝避免直接修改原数据
-  detailDialogVisible.value = true
-}
-
-// 保存修改（合并了编辑保存功能）
-const saveChanges = async () => {
+// 查看详情方法
+const viewDetail = async (row) => {
   try {
-    // 只提交允许修改的字段
+    currentMerchant.value = JSON.parse(JSON.stringify(row));
+
+    // 并行请求
+    const [shopRes, qualRes] = await Promise.all([
+      getShopByName({ id: row.id, username: row.username }),
+      getQulificationById({ merchantId: row.id })
+    ]);
+
+    shop.value = Array.isArray(shopRes.data) ? shopRes.data : [shopRes.data];
+    Qulification.value = Array.isArray(qualRes.data) ? qualRes.data : [qualRes.data];
+
+    console.log('商铺数据:', shop.value);
+    console.log('资质数据:', Qulification.value);
+
+    detailDialogVisible.value = true;
+  } catch (error) {
+    console.error('获取详情失败:', error);
+    ElMessage.error('获取详情失败');
+    // 确保设置为空数组而不是null/undefined
+    shop.value = [];
+    Qulification.value = [];
+  }
+};
+
+const saveChanges = async () => {
     const submitData = {
       id: currentMerchant.value.id,
       username: currentMerchant.value.username,
       phone: currentMerchant.value.phone,
       email: currentMerchant.value.email
     };
-
-    await updateMerchant(submitData);
-    ElMessage.success('商户信息更新成功');
-    getMerchants();
-    detailDialogVisible.value = false;
-  } catch (error) {
-    ElMessage.error('更新商户信息失败');
-  }
+    updateMerchant(submitData)
+        .then(res => {
+          if (res.status) { // 根据你的后端实际返回结构调整
+            ElMessage({
+              message: "编辑成功",
+              type: "success",
+            });
+            getMerchants(); // 刷新用户列表
+          } else {
+            ElMessage({
+              message: res.message,
+              type: "warning",
+            });
+          }
+        })
+        .catch(error => {
+          ElMessage({
+            message: error.message || "请求失败，请稍后重试",
+            type: "error",
+          });
+        })
+        .finally(() => {
+          detailDialogVisible.value = false;
+        });
 };
-
 // 查看审核
 const viewAuditDetails = (row) => {
   currentAuditMerchant.value = row;
@@ -124,12 +182,10 @@ const viewAuditDetails = (row) => {
   };
   auditDialogVisible.value = true;
 };
-
 // 取消审核
 const cancelAudit = () => {
   auditDialogVisible.value = false;
 };
-
 // 保存审核
 const saveAudit = async () => {
   if (!currentAuditMerchant.value) return;
@@ -148,7 +204,6 @@ const saveAudit = async () => {
     ElMessage.error('更新审核状态失败');
   }
 };
-
 // 处罚商家
 const punishMerchant = (row) => {
   punishDialogVisible.value = true;
@@ -158,8 +213,6 @@ const punishMerchant = (row) => {
     punishMeasure: '',
   };
 };
-
-// 保存处罚
 // 保存处罚
 const savePunish = async () => {
   if (!currentPunishMerchant.value) return;
@@ -201,15 +254,6 @@ const savePunish = async () => {
   }
 };
 
-// 处理文件上传成功
-const handleFileUploadSuccess = (response, file, fileList) => {
-  console.log('File upload success:', response);
-};
-// 处理图片上传成功
-const handleImageUploadSuccess = (response, file, fileList) => {
-  console.log('Image upload success:', response);
-};
-
 getMerchants();
 </script>
 
@@ -236,7 +280,7 @@ getMerchants();
         <el-button type="primary" @click="getMerchants">查询</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="merchantList" height="500" style="width: 100%">
+    <el-table :data="merchantList" style="width: 100%">
       <el-table-column prop="username" label="商户名称" width="150%"/>
       <el-table-column prop="phone" label="电话" />
       <el-table-column prop="email" label="邮箱" width="200%" />
@@ -315,22 +359,104 @@ getMerchants();
         </el-form>
       </el-tab-pane>
 
-      <el-tab-pane label="设置信息">
-        <el-form label-width="120px">
-          <el-form-item label="头像">
-            <el-upload
-                class="avatar-uploader"
-                action="/api/upload"
-                :show-file-list="false"
-                :on-success="handleAvatarSuccess"
-            >
-              <img v-if="currentMerchant.avatar" :src="currentMerchant.avatar" class="avatar" />
-              <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
-            </el-upload>
-          </el-form-item>
-        </el-form>
+      <el-tab-pane label="商铺">
+        <el-table :data="shop" style="width: 100%" border v-if="shop.length > 0">
+          <!-- 固定列定义（推荐方式） -->
+          <el-table-column prop="id" label="ID" width="80" align="center" />
+          <el-table-column prop="username" label="用户名" width="120" />
+          <el-table-column prop="merchantName" label="商户名称" width="150" />
+          <el-table-column prop="address" label="地址" show-overflow-tooltip />
+          <el-table-column prop="description" label="描述" show-overflow-tooltip />
+          <el-table-column prop="categoryId" label="分类ID" width="100" align="center">
+            <template #default="{row}">
+              <el-tag v-if="row.categoryId">{{ row.categoryId }}</el-tag>
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建时间" width="180">
+            <template #default="{row}">
+              {{ formatDate(row.createTime) }}
+            </template>
+          </el-table-column>
+          <el-table-column prop="isDeleted" label="状态" width="100" align="center">
+            <template #default="{row}">
+              <el-tag :type="row.isDeleted === 0 ? 'success' : 'danger'">
+                {{ row.isDeleted === 0 ? '正常' : '已删除' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-empty description="暂无商铺数据" v-else />
+      </el-tab-pane>
+
+      <el-tab-pane label="资质信息">
+        <el-table :data="Qulification" style="width: 100%" border v-if="Qulification && Qulification.length > 0">
+          <el-table-column prop="id" label="ID" width="80" align="center" />
+          <el-table-column prop="merchantId" label="商户ID" width="100" align="center" />
+          <el-table-column prop="licenseNumber" label="许可证编号" width="150" align="center" />
+          <el-table-column label="营业执照" width="180">
+            <template #default="{row}">
+              <el-image
+                  v-if="row.license"
+                  style="width: 100px; height: 60px"
+                  :src="row.license"
+                  :preview-src-list="[row.license]"
+                  fit="cover"
+                  hide-on-click-modal
+                  preview-teleported
+              />
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="卫生许可证" width="180">
+            <template #default="{row}">
+              <el-image
+                  v-if="row.health"
+                  style="width: 100px; height: 60px"
+                  :src="row.health"
+                  :preview-src-list="[row.health]"
+                  fit="cover"
+                  hide-on-click-modal
+                  preview-teleported
+              />
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column label="其他许可" width="150">
+            <template #default="{row}">
+              <el-image
+                  v-if="row.otherPermit"
+                  style="width: 100px; height: 60px"
+                  :src="row.otherPermit"
+                  :preview-src-list="[row.otherPermit]"
+                  fit="cover"
+                  hide-on-click-modal
+                  preview-teleported
+              />
+              <span v-else>-</span>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="status" label="审核状态" width="120" align="center">
+            <template #default="{row}">
+              <el-tag :type="row.status">
+                {{ formatStatus(row.status) }}
+              </el-tag>
+            </template>
+          </el-table-column>
+
+          <el-table-column prop="rejectReason" label="驳回原因" show-overflow-tooltip>
+            <template #default="{row}">
+              {{ row.rejectReason || '-' }}
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-empty description="暂无资质数据" v-else />
       </el-tab-pane>
     </el-tabs>
+
 
     <template #footer>
       <el-button @click="detailDialogVisible = false">取消</el-button>
