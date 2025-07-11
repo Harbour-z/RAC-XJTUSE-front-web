@@ -4,7 +4,7 @@ import { reactive } from 'vue'
 // do not use same name with ref
 const form = reactive({
   address: '',
-  logitude: '',
+  longitude: '',
   latitude:'',
   merchantName: '',
   username:'',
@@ -94,7 +94,7 @@ const handleHealthSuccess = (res, uploadFile) => {
           </el-form-item>
           <el-form-item label="店面地址">
             <el-input v-model="form.address" placeholder="请输入店面地址" />
-            <el-input v-model="form.logitude" placeholder="经度" />
+            <el-input v-model="form.longitude" placeholder="经度" />
             <el-input v-model="form.latitude" placeholder="纬度" />
           </el-form-item>
           <el-form-item label="负责人">
